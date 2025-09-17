@@ -17,8 +17,18 @@
 			<a href="/text-from-image">🖼️</a>
 			<a href="/easier-expression">🔤</a>
 			<a href="image-description">👀</a>
+			<a href="https://translate.google.com" target="_blank">🚪</a>
 		</nav>
 	{/if}
 </header>
 
 {@render children?.()}
+
+<style>
+	a[href='/'] {
+		margin-right: 0.6em;
+	}
+	a[target='_blank'] {
+		margin-left: 0.6em;
+	}
+</style>
