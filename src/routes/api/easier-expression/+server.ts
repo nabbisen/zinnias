@@ -12,7 +12,7 @@ export const POST: RequestHandler = async ({ request, platform }) => {
     }
 
     if (!platform?.env.GOOGLE_APPLICATION_CREDENTIALS_JSON) {
-        console.error('API キーが設定されていません。');
+        console.error('API 認証情報が設定されていません。');
         return json({ error: 'サーバー設定エラー' }, { status: 500 });
     }
 

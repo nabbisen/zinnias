@@ -1,6 +1,8 @@
 import { json, text } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-import vision from '@google-cloud/vision';
+import { accessToken } from '$lib/auth/googleapis';
+
+const API_ENDPOINT = `https://vision.googleapis.com/v1/images:annotate`;
 
 // export const POST: RequestHandler = async ({ params, platform, request }) => {
 export const POST: RequestHandler = async ({ request, platform }) => {
@@ -12,25 +14,52 @@ export const POST: RequestHandler = async ({ request, platform }) => {
     }
 
     if (!platform?.env.GOOGLE_APPLICATION_CREDENTIALS_JSON) {
-        console.error('API キーが設定されていません。');
+        console.error('API 認証情報が設定されていません。');
         return json({ error: 'サーバー設定エラー' }, { status: 500 });
     }
 
     const credentials = JSON.parse(platform.env.GOOGLE_APPLICATION_CREDENTIALS_JSON);
 
-    const client = new vision.ImageAnnotatorClient({
-        credentials,
-        projectId: credentials.project_id,
-    });
+    const at = await accessToken(credentials.private_key, credentials.client_email)
 
     const imageBuffer = await image.arrayBuffer();
+    const imageBase64 = Buffer.from(imageBuffer).toString('base64');
 
-    const [result] = await client.documentTextDetection(Buffer.from(imageBuffer));
+    const requestBody = {
+        requests: [
+            {
+                image: {
+                    content: imageBase64
+                },
+                features: [{ type: 'DOCUMENT_TEXT_DETECTION' }],
+            }
+        ]
+    };
 
-    const detectedText = result.fullTextAnnotation?.pages?.map((page) => page.blocks?.map((block) => {
-        return block.paragraphs?.map((paragraph) => {
-            return paragraph.words?.map((word) => {
-                return word.symbols?.map((symbol) => symbol.text).join("")
+    const response = await fetch(API_ENDPOINT, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${at}`,
+        },
+        body: JSON.stringify(requestBody)
+    }).catch((error) => {
+        console.error('サーバー処理中にエラーが発生しました:', error);
+        return json({ error: 'サーバーで予期せぬエラーが発生しました。' }, { status: 500 });
+    });
+
+    const result = await response.json();
+
+    if (!response.ok) {
+        console.error('API エラー:', result);
+        return json({ error: 'API 呼出し失敗' }, { status: response.status });
+    }
+
+    // todo: type defs for google vision ai api
+    const detectedText = (result as any).responses[0].fullTextAnnotation?.pages?.map((page: any) => page.blocks?.map((block: any) => {
+        return block.paragraphs?.map((paragraph: any) => {
+            return paragraph.words?.map((word: any) => {
+                return word.symbols?.map((symbol: any) => symbol.text).join("")
             }).join("")
         }).join(" ")
     })).join(" ")

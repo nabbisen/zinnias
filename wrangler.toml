@@ -17,12 +17,6 @@ custom_domain = true
 binding = "ASSETS"
 directory = ".svelte-kit/cloudflare"
 
-[vars]
-GOOGLE_APPLICATION_CREDENTIALS_JSON = { secret = "GOOGLE_APPLICATION_CREDENTIALS_JSON" }
-
-# [observability]
-# enabled = true
-# 
 # [[durable_objects.bindings]]
 # name = "OCRCache"
 # class_name = "OCRCache"

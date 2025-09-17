@@ -33,7 +33,7 @@
 
 	function compressImageErrorCallback(err: Error) {
 		console.error('画像の圧縮中にエラーが発生しました:', err.message)
-		alert('画像の圧縮中にエラーが発生しました。')
+		msg = '画像の圧縮中にエラーが発生しました。'
 	}
 
 	async function detectedTextToClipboard() {
