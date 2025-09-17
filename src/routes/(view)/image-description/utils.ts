@@ -1,10 +1,8 @@
-import Compressor from "compressorjs"
-
-export async function textFromImage(file: File) {
+export async function generateImageDescription(file: File) {
     const formData = new FormData()
     formData.append('image', file, file.name)
 
-    const response: Response | void = await fetch('/api/text-from-image', {
+    const response: Response | void = await fetch('/api/image-description', {
         method: 'POST',
         body: formData,
     }).catch((error) => {
@@ -18,5 +16,5 @@ export async function textFromImage(file: File) {
     }
 
     const responseJson: Record<string, any> = await response.json()
-    return responseJson.detectedText
+    return responseJson.generatedText
 }

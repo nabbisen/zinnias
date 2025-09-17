@@ -16,6 +16,7 @@
 			<a href="/">🏠️</a>
 			<a href="/text-from-image">🖼️</a>
 			<a href="/easier-expression">🔤</a>
+			<a href="image-description">👀</a>
 		</nav>
 	{/if}
 </header>
