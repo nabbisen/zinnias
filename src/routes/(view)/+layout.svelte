@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { page } from '$app/state'
 	import favicon from '$lib/assets/favicon.svg'
 
 	let { children } = $props()
@@ -10,9 +11,13 @@
 
 <header>
 	<h1>Zinnias ❁</h1>
-	<nav>
-		<a href="/">🏠️</a>
-	</nav>
+	{#if page.url.pathname !== '/'}
+		<nav>
+			<a href="/">🏠️</a>
+			<a href="/text-from-image">🖼️</a>
+			<a href="/easier-expression">🔤</a>
+		</nav>
+	{/if}
 </header>
 
 {@render children?.()}
