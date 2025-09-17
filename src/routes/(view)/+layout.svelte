@@ -29,9 +29,13 @@
 
 <style>
 	a[href='/'] {
-		margin-right: 0.6em;
+		margin-right: 0.7em;
 	}
 	a[target='_blank'] {
-		margin-left: 0.6em;
+		margin-left: 0.7em;
+	}
+	a:not([href='/']):not([target='_blank']) {
+		font-size: 115%;
+		padding: 0.5em;
 	}
 </style>
