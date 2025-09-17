@@ -1,6 +1,6 @@
 <div>
 	<ul>
-		<li><a href="text-from-image">ぶんしょうをしゅとく</a></li>
+		<li><a href="text-from-image">がぞうのぶんしょうをしゅとく</a></li>
 		<li><a href="easier-expression">やさしいことばにいいかえ</a></li>
 		<li><a href="image-description">がぞうをせつめい</a></li>
 	</ul>
@@ -18,5 +18,8 @@
 	ul {
 		background-color: #ffffffbb;
 		padding: 1.2rem 2.4rem;
+	}
+	ul li:not(:first-child):not(:last-child) {
+		margin: 0.7em 0;
 	}
 </style>

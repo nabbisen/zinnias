@@ -45,14 +45,14 @@
 	}
 </script>
 
-<h2>ぶんしょうをしゅとく</h2>
+<h2>がぞうのぶんしょうをしゅとく</h2>
 
 {#if msg}
 	<p>{msg}</p>
 {/if}
 
 <div>
-	テキストを得る
+	がぞうのテキストを得る
 	<input type="file" onchange={imageOnchange} />
 </div>
 
