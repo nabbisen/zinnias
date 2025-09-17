@@ -10,7 +10,10 @@
 </svelte:head>
 
 <header>
-	<h1>Zinnias ❁</h1>
+	<h1>
+		Zinnias
+		{#if page.url.pathname !== '/'}🌼{/if}
+	</h1>
 	{#if page.url.pathname !== '/'}
 		<nav>
 			<a href="/">🏠️</a>
