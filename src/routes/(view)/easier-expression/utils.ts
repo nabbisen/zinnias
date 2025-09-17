@@ -1,8 +1,9 @@
-export async function generateEasierExpression(text: string) {
+export async function generateEasierExpression(text: string, proficiencyLevel: number) {
     const response: Response | void = await fetch('/api/easier-expression', {
         method: 'POST',
         body: JSON.stringify({
-            text: text,
+            text,
+            proficiencyLevel,
         }),
     }).catch((error) => {
         console.error('クエリ中にエラーが発生しました:', error)

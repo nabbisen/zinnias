@@ -2,6 +2,8 @@ import { json, text } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { VertexAI } from '@google-cloud/vertexai';
 
+const DEFAULT_PROFICIENCY_LEVEL: number = 3
+
 // export const POST: RequestHandler = async ({ params, platform, request }) => {
 export const POST: RequestHandler = async ({ request, platform }) => {
     const requestJson = await request.json() as Record<string, any>
@@ -10,6 +12,8 @@ export const POST: RequestHandler = async ({ request, platform }) => {
     if (!text) {
         return json({ error: 'テキストが見つかりません。' }, { status: 400 });
     }
+
+    const proficiencyLevel = requestJson.proficiencyLevel ?? DEFAULT_PROFICIENCY_LEVEL
 
     if (!platform?.env.GOOGLE_APPLICATION_CREDENTIALS_JSON) {
         console.error('API 認証情報が設定されていません。');
@@ -30,7 +34,8 @@ export const POST: RequestHandler = async ({ request, platform }) => {
         model: 'gemini-2.5-flash-lite',
     });
 
-    const prompt = `以下の文章を、非日本語話者が理解しやすい、平易なものにしなさい。条件: 使える語彙と文法を、日本語能力試験 N2 レベルまでのものに限定する。なるべく短文主義を採用し、かつ、文脈の流れは切らないようには文量のバランス配分をする。主語および目的語があいまいにならないように注意する。回答は生成文章のみに限定する。
+    const proficiencyCondition = 0 <= proficiencyLevel ? `使える語彙と文法を、日本語能力試験 N${proficiencyLevel} レベルまでのものに限定する。` : "使える語彙と文法を日本語能力試験不合格者に合わせて、かつ全体をひらがなとカタカナ中心で構成する。"
+    const prompt = `以下の文章を、非日本語話者が理解しやすい、平易なものにしなさい。条件: ${proficiencyCondition} なるべく短文主義を採用し、かつ、文脈の流れは切らないようには文量のバランス配分をする。主語および目的語があいまいにならないように注意する。回答は生成文章のみに限定する。
 【もとの文章】
 ${text}`;
 
@@ -40,9 +45,8 @@ ${text}`;
         console.error('生成に失敗しました。');
         return json({ error: 'サーバー処理エラー' }, { status: 500 });
     }
-    console.log(123, result.response.candidates[0].content.parts.map((part) => part.text).join("@"))
 
-    const generatedText = result.response.candidates[0].content.parts.map((part) => part.text).join("@");
+    const generatedText = result.response.candidates[0].content.parts.map((part) => part.text).join("");
 
     return json({ generatedText });
 };

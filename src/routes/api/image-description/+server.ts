@@ -55,9 +55,8 @@ export const POST: RequestHandler = async ({ request, platform }) => {
         console.error('生成に失敗しました。');
         return json({ error: 'サーバー処理エラー' }, { status: 500 });
     }
-    console.log(123, result.response.candidates[0].content.parts.map((part) => part.text).join("@"))
 
-    const generatedText = result.response.candidates[0].content.parts.map((part) => part.text).join("@");
+    const generatedText = result.response.candidates[0].content.parts.map((part) => part.text).join("");
 
     return json({ generatedText });
 };
