@@ -51,14 +51,23 @@
 	<p>{msg}</p>
 {/if}
 
-せつめいを得る<input type="file" onchange={handleImageDescription} />
-<label>もとのがぞう<input type="checkbox" bind:checked={showImgSrc} /></label>
+<div>
+	せつめいを得る
+	<input type="file" onchange={handleImageDescription} />
+</div>
 
 {#if imageDescriptionText}
 	<pre>{imageDescriptionText}</pre>
-	<button onclick={textToClipboard}>クリップボードにコピー</button>
+	<div>
+		<button onclick={textToClipboard}>クリップボードにコピー</button>
+	</div>
 {/if}
 
-{#if showImgSrc && imgSrc}
-	<img src={imgSrc} alt="もとのがぞう" />
+{#if imgSrc}
+	<div>
+		<label>もとのがぞう<input type="checkbox" bind:checked={showImgSrc} /></label>
+	</div>
+	{#if showImgSrc}
+		<img src={imgSrc} alt="もとのがぞう" />
+	{/if}
 {/if}

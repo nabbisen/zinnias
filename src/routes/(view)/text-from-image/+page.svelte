@@ -51,14 +51,23 @@
 	<p>{msg}</p>
 {/if}
 
-テキストを得る<input type="file" onchange={imageOnchange} />
-<label>もとのがぞう<input type="checkbox" bind:checked={showImgSrc} /></label>
+<div>
+	テキストを得る
+	<input type="file" onchange={imageOnchange} />
+</div>
 
 {#if detectedText}
 	<p>{detectedText}</p>
-	<button onclick={textToClipboard}>クリップボードにコピー</button>
+	<div>
+		<button onclick={textToClipboard}>クリップボードにコピー</button>
+	</div>
 {/if}
 
-{#if showImgSrc && imgSrc}
-	<img src={imgSrc} alt="もとのがぞう" />
+{#if imgSrc}
+	<div>
+		<label>もとのがぞう<input type="checkbox" bind:checked={showImgSrc} /></label>
+	</div>
+	{#if showImgSrc}
+		<img src={imgSrc} alt="もとのがぞう" />
+	{/if}
 {/if}

@@ -18,8 +18,17 @@
 
 <textarea bind:value={text}></textarea>
 
-<button onclick={handleEasierExpression}>やさしいひょうげん</button>
+<div>
+	<button onclick={handleEasierExpression}>やさしいひょうげん</button>
+</div>
 
 {#if easierExpressionText}
 	<pre>{easierExpressionText}</pre>
 {/if}
+
+<style>
+	textarea {
+		min-width: 21em;
+		min-height: 6em;
+	}
+</style>
