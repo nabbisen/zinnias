@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { copyToClipboard } from '$lib/utils'
 	import { compressImage, textFromImage } from './utils'
 
 	let msg = $state('')
@@ -34,9 +35,17 @@
 		console.error('画像の圧縮中にエラーが発生しました:', err.message)
 		alert('画像の圧縮中にエラーが発生しました。')
 	}
+
+	async function detectedTextToClipboard() {
+		if (await copyToClipboard(detectedText)) {
+			msg = 'クリップボードにコピーしました'
+		} else {
+			msg = 'クリップボードへのコピーがしっぱいしました'
+		}
+	}
 </script>
 
-<h2>Practice</h2>
+<h2>ぶんしょうをしゅとく</h2>
 
 {#if msg}
 	<p>{msg}</p>
@@ -44,10 +53,12 @@
 
 テキストを得る<input type="file" onchange={imageOnchange} />
 <label>もとのがぞう<input type="checkbox" bind:checked={showImgSrc} /></label>
-{#if showImgSrc && imgSrc}
-	<img src={imgSrc} alt="もとのがぞう" />
-{/if}
 
 {#if detectedText}
-	{detectedText}
+	<p>{detectedText}</p>
+	<button onclick={detectedTextToClipboard}>クリップボードにコピー</button>
+{/if}
+
+{#if showImgSrc && imgSrc}
+	<img src={imgSrc} alt="もとのがぞう" />
 {/if}

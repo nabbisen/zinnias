@@ -38,6 +38,7 @@ export const POST: RequestHandler = async ({ request, platform }) => {
     return json({ detectedText });
 };
 
+// todo: necessay ? can be removed ?
 // This handler will respond to PUT, PATCH, DELETE, etc.
 export const fallback: RequestHandler = async ({ request }) => {
     return text(`I caught your ${request.method} request!`)
