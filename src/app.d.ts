@@ -11,7 +11,7 @@ declare global {
 }
 
 interface Env {
-    API_KEY: string;
+    GOOGLE_APPLICATION_CREDENTIALS_JSON: string;
 }
 
 export { };

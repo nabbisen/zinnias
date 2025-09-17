@@ -16,6 +16,7 @@
 		"cf-typegen": "wrangler types ./src/worker-configuration.d.ts"
 	},
 	"dependencies": {
+		"@google-cloud/vision": "^5.3.3",
 		"compressorjs": "^1.2.1"
 	},
 	"devDependencies": {

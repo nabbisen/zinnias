@@ -3,6 +3,7 @@
 
 	let msg = $state('')
 	let imgSrc = $state('')
+	let showImgSrc = $state(false)
 	let detectedText = $state('')
 
 	function imageOnchange(e: Event) {
@@ -42,10 +43,11 @@
 {/if}
 
 テキストを得る<input type="file" onchange={imageOnchange} />
-{#if imgSrc}
+<label>もとのがぞう<input type="checkbox" bind:checked={showImgSrc} /></label>
+{#if showImgSrc && imgSrc}
 	<img src={imgSrc} alt="もとのがぞう" />
 {/if}
 
 {#if detectedText}
-	<p>{detectedText}</p>
+	{detectedText}
 {/if}

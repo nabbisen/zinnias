@@ -1,7 +1,6 @@
 import { json, text } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-
-const API_ENDPOINT = 'https://vision.googleapis.com/v1/images:annotate';
+import vision from '@google-cloud/vision';
 
 // export const POST: RequestHandler = async ({ params, platform, request }) => {
 export const POST: RequestHandler = async ({ request, platform }) => {
@@ -12,46 +11,30 @@ export const POST: RequestHandler = async ({ request, platform }) => {
         return json({ error: '画像ファイルが見つからないか、形式が不正です。' }, { status: 400 });
     }
 
-    if (!platform?.env.API_KEY) {
+    if (!platform?.env.GOOGLE_APPLICATION_CREDENTIALS_JSON) {
         console.error('API キーが設定されていません。');
         return json({ error: 'サーバー設定エラー' }, { status: 500 });
     }
 
-    const imageBuffer = await image.arrayBuffer();
-    const imageBase64 = Buffer.from(imageBuffer).toString('base64');
+    const credentials = JSON.parse(platform.env.GOOGLE_APPLICATION_CREDENTIALS_JSON);
 
-    const requestBody = {
-        requests: [
-            {
-                image: {
-                    content: imageBase64
-                },
-                features: [{ type: 'TEXT_DETECTION' }],
-            }
-        ]
-    };
-
-    const response = await fetch(API_ENDPOINT, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-Goog-Api-Key': platform.env.API_KEY,
-        },
-        body: JSON.stringify(requestBody)
-    }).catch((error) => {
-        console.error('サーバー処理中にエラーが発生しました:', error);
-        return json({ error: 'サーバーで予期せぬエラーが発生しました。' }, { status: 500 });
+    const client = new vision.ImageAnnotatorClient({
+        credentials,
+        projectId: credentials.project_id,
     });
 
-    const result = await response.json();
+    const imageBuffer = await image.arrayBuffer();
 
-    if (!response.ok) {
-        console.error('API エラー:', result);
-        return json({ error: 'API 呼出し失敗' }, { status: response.status });
-    }
+    const [result] = await client.documentTextDetection(Buffer.from(imageBuffer));
 
-    // const labels = (result as any).responses[0]?.labelAnnotations || [];
-    const detectedText = (result as any).responses[0].fullTextAnnotation
+    const detectedText = result.fullTextAnnotation?.pages?.map((page) => page.blocks?.map((block) => {
+        return block.paragraphs?.map((paragraph) => {
+            return paragraph.words?.map((word) => {
+                return word.symbols?.map((symbol) => symbol.text).join("")
+            }).join("")
+        }).join(" ")
+    })).join(" ")
+
     return json({ detectedText });
 };
 
