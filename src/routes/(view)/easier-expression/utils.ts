@@ -1,6 +1,9 @@
 export async function generateEasierExpression(text: string, proficiencyLevel: number) {
     const response: Response | void = await fetch('/api/easier-expression', {
         method: 'POST',
+        headers: {
+            "CF-TURNSTILE-RESPONSE": (document.querySelector("input[name=\"cf-turnstile-response\"]") as unknown as HTMLInputElement).value
+        },
         body: JSON.stringify({
             text,
             proficiencyLevel,

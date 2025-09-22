@@ -12,6 +12,7 @@ declare global {
 
 interface Env {
     GOOGLE_APPLICATION_CREDENTIALS_JSON: string;
+    CLOUDFLARE_TURNSTILE_SECRET: string;
 }
 
 export { };

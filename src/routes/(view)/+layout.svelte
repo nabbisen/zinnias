@@ -7,6 +7,8 @@
 
 <svelte:head>
 	<link rel="icon" href={favicon} />
+
+	<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 </svelte:head>
 
 <header>
@@ -23,6 +25,14 @@
 			<a href="https://translate.google.com" target="_blank">🚪</a>
 		</nav>
 	{/if}
+
+	<div
+		class="cf-turnstile"
+		data-sitekey="0x4AAAAAAB10XkovXKRU1Ct5"
+		data-callback={(e: any) => {
+			console.log(123, e)
+		}}
+	></div>
 </header>
 
 {@render children?.()}

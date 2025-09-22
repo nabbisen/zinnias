@@ -4,6 +4,9 @@ export async function generateImageDescription(file: File) {
 
     const response: Response | void = await fetch('/api/image-description', {
         method: 'POST',
+        headers: {
+            "CF-TURNSTILE-RESPONSE": (document.querySelector("input[name=\"cf-turnstile-response\"]") as unknown as HTMLInputElement).value
+        },
         body: formData,
     }).catch((error) => {
         console.error('アップロード中にエラーが発生しました:', error)
