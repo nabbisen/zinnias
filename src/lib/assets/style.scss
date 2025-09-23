@@ -8,6 +8,14 @@ pre,
     text-wrap: auto;
 }
 
+.katex-inline {
+    font-family: 'Times New Roman', Times, serif;
+
+    .mord.mathnormal {
+        font-style: italic;
+    }
+}
+
 footer {
     margin-top: 1.1rem;
     font-size: 0.7rem;
