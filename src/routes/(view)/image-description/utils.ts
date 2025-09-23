@@ -13,17 +13,18 @@ export async function generateImageDescription(file: File): Promise<string> {
         },
         body: formData,
     }).catch((error) => {
-        console.error('アップロード中にエラーが発生しました:', error)
-        alert('アップロードに失敗しました。')
+        throw new Error('クエリ中にエラーが発生しました:', error)
     }).finally(() => {
         turnstile.reset()
         loading.stop()
     })
 
-    if (!response) return ""
+    if (!response) {
+        throw new Error('クエリ応答が空でした')
+    }
 
     if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`)
+        throw new Error(`クエリに失敗しました: ${response.body} (status = ${response.status})`)
     }
 
     const responseJson: Record<string, any> = await response.json()

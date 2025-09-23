@@ -4,8 +4,8 @@
 	import { generateMathGuide } from './utils'
 	import dompurify from 'dompurify'
 	import katex, { type KatexOptions } from 'katex'
+	import { messages } from '$lib/stores/message-center.svelte'
 
-	let msg = $state('')
 	let imgSrc = $state('')
 	let showImgSrc = $state(false)
 	let readGeneratedTexts = $state('')
@@ -31,7 +31,7 @@
 
 	function handleMathGuide(processor: string) {
 		if (!selectedFile) {
-			msg = 'イメージがえらばれていません。'
+			messages.pushWarn('イメージがえらばれていません')
 			return
 		}
 
@@ -50,7 +50,13 @@
 		}
 		compressedReader.readAsDataURL(file)
 
-		const ret = (await generateMathGuide(file, processor)) as string
+		let ret: string
+		try {
+			ret = (await generateMathGuide(file, processor)) as string
+		} catch (error) {
+			messages.pushError(error as string)
+			return
+		}
 
 		let retHTML = dompurify.sanitize(await marked.parse(ret))
 		const katexRegex = /\$\$[^$]+\$\$|\$[^$]+\$/g
@@ -98,9 +104,8 @@
 		}
 	}
 
-	function compressImageErrorCallback(err: Error) {
-		console.error('画像の圧縮中にエラーが発生しました:', err.message)
-		msg = '画像の圧縮中にエラーが発生しました。'
+	function compressImageErrorCallback(error: Error) {
+		messages.pushError('画像の圧縮中にエラーが発生しました:', error.message)
 	}
 
 	function handleReadMathGuide() {
@@ -117,9 +122,9 @@
 
 	async function textToClipboard(text: string) {
 		if (await copyToClipboard(text)) {
-			msg = 'クリップボードにコピーしました'
+			messages.pushInfo('クリップボードにコピーしました')
 		} else {
-			msg = 'クリップボードへのコピーがしっぱいしました'
+			messages.pushError('クリップボードへのコピーがしっぱいしました')
 		}
 	}
 
@@ -137,10 +142,6 @@
 </script>
 
 <h2>すうがくをかいせつ</h2>
-
-{#if msg}
-	<p>{msg}</p>
-{/if}
 
 <div>
 	せつめいを得る

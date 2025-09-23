@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { messages } from '$lib/stores/message-center.svelte'
 	import { generateEasierExpression } from './utils'
 
 	const PROFICIENCY_LEVELS = [
@@ -8,21 +9,20 @@
 		{ level: 3, label: 'N3 ふつう' },
 	]
 
-	let msg = $state('')
 	let text = $state('')
 	let proficiencyLevel = $state(PROFICIENCY_LEVELS.find((x) => x.level === 4)!.level)
 	let easierExpressionText = $state('')
 
 	async function handleEasierExpression() {
-		easierExpressionText = await generateEasierExpression(text, proficiencyLevel)
+		try {
+			easierExpressionText = await generateEasierExpression(text, proficiencyLevel)
+		} catch (error) {
+			messages.pushError(error as string)
+		}
 	}
 </script>
 
 <h2>やさしいことばにいいかえ</h2>
-
-{#if msg}
-	<p>{msg}</p>
-{/if}
 
 <select bind:value={proficiencyLevel}>
 	{#each PROFICIENCY_LEVELS as p}

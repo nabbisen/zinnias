@@ -4,6 +4,7 @@
 	import favicon from '$lib/assets/favicon.svg'
 	import '$lib/assets/style.scss'
 	import LoadingEffect from '$lib/components/LoadingEffect.svelte'
+	import MessageCenter from '$lib/components/MessageCenter.svelte'
 
 	const CLOUDFLARE_TURNSTILE_SITE_KEY = '0x4AAAAAAB10XkovXKRU1Ct5'
 	const CLOUDFLARE_TURNSTILE_TEST_SITE_KEY_ALWAYS_PASSES = '1x00000000000000000000AA'
@@ -49,6 +50,7 @@
 <footer>AI 生成はときに誤りを含みます。自己レビューの上お使いください。</footer>
 
 <LoadingEffect />
+<MessageCenter />
 
 <style>
 	a[href='/'] {

@@ -1,8 +1,8 @@
 <script lang="ts">
+	import { messages } from '$lib/stores/message-center.svelte'
 	import { compressImage, copyToClipboard } from '$lib/utils'
 	import { generateImageDescription } from './utils'
 
-	let msg = $state('')
 	let imgSrc = $state('')
 	let showImgSrc = $state(false)
 	let imageDescriptionText = $state('')
@@ -11,7 +11,7 @@
 		const files = (e.target as HTMLInputElement).files
 
 		if (!files || files.length === 0) {
-			msg = 'イメージがえらばれていません。'
+			messages.pushWarn('イメージがえらばれていません')
 			return
 		}
 
@@ -27,29 +27,27 @@
 		}
 		compressedReader.readAsDataURL(file)
 
-		const ret = await generateImageDescription(file)
-		imageDescriptionText = ret
+		try {
+			imageDescriptionText = await generateImageDescription(file)
+		} catch (error) {
+			messages.pushError(error as string)
+		}
 	}
 
-	function compressImageErrorCallback(err: Error) {
-		console.error('画像の圧縮中にエラーが発生しました:', err.message)
-		msg = '画像の圧縮中にエラーが発生しました。'
+	function compressImageErrorCallback(error: Error) {
+		messages.pushError('画像の圧縮中にエラーが発生しました:', error.message)
 	}
 
 	async function textToClipboard() {
 		if (await copyToClipboard(imageDescriptionText)) {
-			msg = 'クリップボードにコピーしました'
+			messages.pushInfo('クリップボードにコピーしました')
 		} else {
-			msg = 'クリップボードへのコピーがしっぱいしました'
+			messages.pushError('クリップボードへのコピーがしっぱいしました')
 		}
 	}
 </script>
 
 <h2>がぞうをせつめい</h2>
-
-{#if msg}
-	<p>{msg}</p>
-{/if}
 
 <div>
 	せつめいを得る

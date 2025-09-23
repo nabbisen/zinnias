@@ -1,15 +1,15 @@
-const state = $state({
+const state: { active: boolean } = $state({
     active: false
-});
+})
 
 export const loading = {
     get active() {
-        return state.active;
+        return state.active
     },
     start() {
-        state.active = true;
+        state.active = true
     },
     stop() {
-        state.active = false;
+        state.active = false
     }
-};
+}
