@@ -1,4 +1,8 @@
+import { loading } from "$lib/stores/loading-effect.svelte"
+
 export async function generateMathGuide(file: File, processor: string): Promise<string> {
+    loading.start()
+
     const formData = new FormData()
     formData.append('image', file, file.name)
     formData.append('processor', processor)
@@ -12,6 +16,8 @@ export async function generateMathGuide(file: File, processor: string): Promise<
     }).catch((error) => {
         console.error('アップロード中にエラーが発生しました:', error)
         alert('アップロードに失敗しました。')
+    }).finally(() => {
+        loading.stop()
     })
 
     if (!response) return ""

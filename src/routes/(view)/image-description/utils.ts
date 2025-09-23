@@ -1,4 +1,8 @@
+import { loading } from "$lib/stores/loading-effect.svelte"
+
 export async function generateImageDescription(file: File): Promise<string> {
+    loading.start()
+
     const formData = new FormData()
     formData.append('image', file, file.name)
 
@@ -11,6 +15,8 @@ export async function generateImageDescription(file: File): Promise<string> {
     }).catch((error) => {
         console.error('アップロード中にエラーが発生しました:', error)
         alert('アップロードに失敗しました。')
+    }).finally(() => {
+        loading.stop()
     })
 
     if (!response) return ""

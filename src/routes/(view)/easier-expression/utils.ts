@@ -1,4 +1,8 @@
+import { loading } from "$lib/stores/loading-effect.svelte"
+
 export async function generateEasierExpression(text: string, proficiencyLevel: number): Promise<string> {
+    loading.start()
+
     const response: Response | void = await fetch('/api/easier-expression', {
         method: 'POST',
         headers: {
@@ -11,6 +15,8 @@ export async function generateEasierExpression(text: string, proficiencyLevel: n
     }).catch((error) => {
         console.error('クエリ中にエラーが発生しました:', error)
         alert('クエリに失敗しました。')
+    }).finally(() => {
+        loading.stop()
     })
 
     if (!response) return ""
