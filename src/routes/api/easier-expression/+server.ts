@@ -1,7 +1,7 @@
 import { json, text } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-import { VertexAI } from '@google-cloud/vertexai';
 import { validateTurnstile } from '$lib/utils/turnstile';
+import { VertexAI } from '@google-cloud/vertexai';
 
 const DEFAULT_PROFICIENCY_LEVEL: number = 3
 

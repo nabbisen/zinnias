@@ -1,7 +1,7 @@
 import { json, text } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-import { VertexAI, type Part } from '@google-cloud/vertexai';
 import { validateTurnstile } from '$lib/utils/turnstile';
+import { VertexAI, type Part } from '@google-cloud/vertexai';
 
 const PROCESSORS = ["read", "describe", "solve"]
 

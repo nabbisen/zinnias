@@ -1,9 +1,9 @@
 <script lang="ts">
 	import { compressImage, copyToClipboard } from '$lib/utils'
 	import { marked } from 'marked'
-	import { generateMathGuide } from './utils'
+	import { generateMathGuide, translate } from './utils'
 	import dompurify from 'dompurify'
-	import katex, { type KatexOptions } from 'katex'
+	import katex from 'katex'
 	import { messages } from '$lib/stores/message-center.svelte'
 
 	let imgSrc = $state('')
@@ -12,8 +12,10 @@
 	let readHTML = $state('')
 	let describeGeneratedTexts = $state('')
 	let describeHTML = $state('')
+	let describeTranslateHTML = $state('')
 	let solveGeneratedTexts = $state('')
 	let solveHTML = $state('')
+	let solveTranslateHTML = $state('')
 
 	let selectedFile: File | null = null
 
@@ -58,32 +60,7 @@
 			return
 		}
 
-		let retHTML = dompurify.sanitize(await marked.parse(ret))
-		const katexRegex = /\$\$[^$]+\$\$|\$[^$]+\$/g
-		retHTML = retHTML.replace(katexRegex, (matched: string) => {
-			let displayMode = false
-			let latex = ''
-			if (matched.startsWith('$$')) {
-				latex = matched.slice(2, -2)
-				displayMode = true
-			} else {
-				latex = matched.slice(1, -1)
-			}
-
-			let rendered = ''
-			try {
-				rendered = katex.renderToString(latex, {
-					displayMode,
-					output: displayMode ? 'mathml' : 'html',
-				})
-			} catch {
-				return matched
-			}
-
-			return displayMode
-				? `<div class="katex-display">${rendered}</div>`
-				: `<span class="katex-inline">${rendered}</span>`
-		})
+		const retHTML = await markdownToMathHTML(ret)
 
 		switch (processor) {
 			case 'read': {
@@ -104,6 +81,39 @@
 		}
 	}
 
+	const KATEX_REGEX = /\$\$[^$]+\$\$|\$[^$]+\$/g
+
+	async function markdownToMathHTML(text: string): Promise<string> {
+		let retHTML = dompurify.sanitize(await marked.parse(text))
+		retHTML = retHTML.replace(KATEX_REGEX, katexReplace)
+		return retHTML
+	}
+
+	function katexReplace(matched: string) {
+		let displayMode = false
+		let latex = ''
+		if (matched.startsWith('$$')) {
+			latex = matched.slice(2, -2)
+			displayMode = true
+		} else {
+			latex = matched.slice(1, -1)
+		}
+
+		let rendered = ''
+		try {
+			rendered = katex.renderToString(latex, {
+				displayMode,
+				output: displayMode ? 'mathml' : 'html',
+			})
+		} catch {
+			return matched
+		}
+
+		return displayMode
+			? `<div class="katex-display">${rendered}</div>`
+			: `<span class="katex-inline">${rendered}</span>`
+	}
+
 	function compressImageErrorCallback(error: Error) {
 		messages.pushError('画像の圧縮中にエラーが発生しました:', error.message)
 	}
@@ -118,6 +128,16 @@
 
 	function handleSolveMathGuide() {
 		handleMathGuide('solve')
+	}
+
+	async function describeTranslate() {
+		describeTranslateHTML = await markdownToMathHTML(
+			await translate(describeGeneratedTexts, 'zh-CN')
+		)
+	}
+
+	async function solveTranslate() {
+		solveTranslateHTML = await markdownToMathHTML(await translate(solveGeneratedTexts, 'zh-CN'))
 	}
 
 	async function textToClipboard(text: string) {
@@ -167,6 +187,14 @@
 	<div>
 		<button onclick={describeTextToClipboard}>クリップボードにコピー</button>
 	</div>
+	<div>
+		<button onclick={describeTranslate}>中国語（簡体）</button>
+		{#if describeTranslateHTML}
+			<div class="markdown-container">
+				{@html describeTranslateHTML}
+			</div>
+		{/if}
+	</div>
 	<hr />
 {/if}
 
@@ -177,6 +205,14 @@
 	</div>
 	<div>
 		<button onclick={solveTextToClipboard}>クリップボードにコピー</button>
+	</div>
+	<div>
+		<button onclick={solveTranslate}>中国語（簡体）</button>
+		{#if solveTranslateHTML}
+			<div class="markdown-container">
+				{@html solveTranslateHTML}
+			</div>
+		{/if}
 	</div>
 	<hr />
 {/if}
