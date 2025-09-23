@@ -1,6 +1,11 @@
 <script lang="ts">
+	import { dev } from '$app/environment'
 	import { page } from '$app/state'
 	import favicon from '$lib/assets/favicon.svg'
+	import '$lib/assets/style.scss'
+
+	const CLOUDFLARE_TURNSTILE_SITE_KEY = '0x4AAAAAAB10XkovXKRU1Ct5'
+	const CLOUDFLARE_TURNSTILE_TEST_SITE_KEY_ALWAYS_PASSES = '1x00000000000000000000AA'
 
 	let { children } = $props()
 </script>
@@ -29,7 +34,9 @@
 
 	<div
 		class="cf-turnstile"
-		data-sitekey="0x4AAAAAAB10XkovXKRU1Ct5"
+		data-sitekey={dev
+			? CLOUDFLARE_TURNSTILE_TEST_SITE_KEY_ALWAYS_PASSES
+			: CLOUDFLARE_TURNSTILE_SITE_KEY}
 		data-callback={(e: any) => {
 			console.log(123, e)
 		}}
@@ -37,6 +44,8 @@
 </header>
 
 {@render children?.()}
+
+<footer>AI 生成はときに誤りを含みます。自己レビューの上お使いください。</footer>
 
 <style>
 	a[href='/'] {
