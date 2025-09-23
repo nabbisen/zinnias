@@ -1,9 +1,12 @@
+<script>
+	import { NAV_MENUS } from '$lib/constants/nav'
+</script>
+
 <div>
 	<ul>
-		<li><a href="text-from-image">がぞうのぶんしょうをしゅとく</a></li>
-		<li><a href="easier-expression">やさしいことばにいいかえ</a></li>
-		<li><a href="image-description">がぞうをせつめい</a></li>
-		<li><a href="math-guide">すうがくをかいせつ</a></li>
+		{#each NAV_MENUS as menu}
+			<li><a href={menu.link}>{menu.label}</a></li>
+		{/each}
 	</ul>
 </div>
 
