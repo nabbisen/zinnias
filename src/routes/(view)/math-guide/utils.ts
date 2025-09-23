@@ -17,6 +17,7 @@ export async function generateMathGuide(file: File, processor: string): Promise<
         console.error('アップロード中にエラーが発生しました:', error)
         alert('アップロードに失敗しました。')
     }).finally(() => {
+        turnstile.reset()
         loading.stop()
     })
 

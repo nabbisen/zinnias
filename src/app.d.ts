@@ -8,6 +8,12 @@ declare global {
             ctx: ExecutionContext
         }
     }
+
+    const turnstile: {
+        render: (element: string | HTMLElement, options: object) => string;
+        reset: (widgetId?: string) => void;
+        getResponse: (widgetId?: string) => string | undefined;
+    }
 }
 
 interface Env {

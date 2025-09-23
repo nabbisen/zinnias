@@ -16,6 +16,7 @@ export async function generateEasierExpression(text: string, proficiencyLevel: n
         console.error('クエリ中にエラーが発生しました:', error)
         alert('クエリに失敗しました。')
     }).finally(() => {
+        turnstile.reset()
         loading.stop()
     })
 

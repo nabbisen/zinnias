@@ -16,6 +16,7 @@ export async function generateImageDescription(file: File): Promise<string> {
         console.error('アップロード中にエラーが発生しました:', error)
         alert('アップロードに失敗しました。')
     }).finally(() => {
+        turnstile.reset()
         loading.stop()
     })
 
