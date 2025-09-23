@@ -2,6 +2,7 @@
 	import { dev } from '$app/environment'
 	import { page } from '$app/state'
 	import favicon from '$lib/assets/favicon.svg'
+	import homeUrlQrcode from '$lib/assets/home-url-qrcode.svg'
 	import '$lib/assets/style.scss'
 	import LoadingEffect from '$lib/components/LoadingEffect.svelte'
 	import MessageCenter from '$lib/components/MessageCenter.svelte'
@@ -47,7 +48,12 @@
 
 {@render children?.()}
 
-<footer>AI 生成はときに誤りを含みます。自己レビューの上お使いください。</footer>
+<footer>
+	{#if page.url.pathname === '/'}
+		<img width="120" src={homeUrlQrcode} alt="Home URL QR Code" />
+	{/if}
+	<div>AI 生成はときに誤りを含みます。自己レビューの上お使いください。</div>
+</footer>
 
 <LoadingEffect />
 <MessageCenter />
