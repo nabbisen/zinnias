@@ -8,12 +8,12 @@
 
 	let imgSrc = $state('')
 	let showImgSrc = $state(false)
-	let readGeneratedTexts = $state('')
+	let readGeneratedText = $state('')
 	let readHTML = $state('')
-	let describeGeneratedTexts = $state('')
+	let describeGeneratedText = $state('')
 	let describeHTML = $state('')
 	let describeTranslateHTML = $state('')
-	let solveGeneratedTexts = $state('')
+	let solveGeneratedText = $state('')
 	let solveHTML = $state('')
 	let solveTranslateHTML = $state('')
 
@@ -64,17 +64,17 @@
 
 		switch (processor) {
 			case 'read': {
-				readGeneratedTexts = ret
+				readGeneratedText = ret
 				readHTML = retHTML
 				break
 			}
 			case 'describe': {
-				describeGeneratedTexts = ret
+				describeGeneratedText = ret
 				describeHTML = retHTML
 				break
 			}
 			case 'solve': {
-				solveGeneratedTexts = ret
+				solveGeneratedText = ret
 				solveHTML = retHTML
 				break
 			}
@@ -130,34 +130,70 @@
 		handleMathGuide('solve')
 	}
 
-	async function describeTranslate() {
-		describeTranslateHTML = await markdownToMathHTML(
-			await translate(describeGeneratedTexts, 'zh-CN')
-		)
+	async function handleTranslate(
+		e: MouseEvent & {
+			currentTarget: EventTarget & HTMLButtonElement
+		}
+	) {
+		const processor = e.currentTarget.dataset.processor!
+		const targetLanguage = e.currentTarget.dataset.targetLanguage!
+
+		switch (processor) {
+			case 'describe': {
+				describeTranslateHTML = await markdownToMathHTML(
+					await translate(describeGeneratedText, targetLanguage)
+				)
+				break
+			}
+			case 'solve': {
+				solveTranslateHTML = await markdownToMathHTML(
+					await translate(solveGeneratedText, targetLanguage)
+				)
+				break
+			}
+			default: {
+				messages.pushError('よきせぬえらーです')
+				break
+			}
+		}
 	}
 
-	async function solveTranslate() {
-		solveTranslateHTML = await markdownToMathHTML(await translate(solveGeneratedTexts, 'zh-CN'))
-	}
+	async function handleTextToClipboard(
+		e: MouseEvent & {
+			currentTarget: EventTarget & HTMLButtonElement
+		}
+	) {
+		const processor = e.currentTarget.dataset.processor!
 
-	async function textToClipboard(text: string) {
+		let text = ''
+		switch (processor) {
+			case 'read': {
+				text = readGeneratedText
+				break
+			}
+			case 'describe': {
+				text = describeGeneratedText
+				break
+			}
+			case 'solve': {
+				text = solveGeneratedText
+				break
+			}
+			default: {
+				messages.pushError('よきせぬえらーです')
+				break
+			}
+		}
+		if (!text) {
+			messages.pushError('はりつけるテキストがありません')
+			return
+		}
+
 		if (await copyToClipboard(text)) {
 			messages.pushInfo('クリップボードにコピーしました')
 		} else {
 			messages.pushError('クリップボードへのコピーがしっぱいしました')
 		}
-	}
-
-	function readTextToClipboard() {
-		textToClipboard(readGeneratedTexts)
-	}
-
-	function describeTextToClipboard() {
-		textToClipboard(describeGeneratedTexts)
-	}
-
-	function solveTextToClipboard() {
-		textToClipboard(solveGeneratedTexts)
 	}
 </script>
 
@@ -169,51 +205,62 @@
 </div>
 
 <button onclick={handleReadMathGuide}>もんだいぶん の にほんご</button>
-{#if readGeneratedTexts}
+{#if readGeneratedText}
 	<div class="markdown-container">
 		{@html readHTML}
 	</div>
 	<div>
-		<button onclick={readTextToClipboard}>クリップボードにコピー</button>
+		<button data-processor="read" onclick={handleTextToClipboard}>クリップボードにコピー</button>
 	</div>
 	<hr />
 {/if}
 
 <button onclick={handleDescribeMathGuide}>題意 (だいい) と ときかた</button>
-{#if describeGeneratedTexts}
+{#if describeGeneratedText}
 	<div class="markdown-container">
 		{@html describeHTML}
 	</div>
 	<div>
-		<button onclick={describeTextToClipboard}>クリップボードにコピー</button>
+		<button data-processor="describe" onclick={handleTextToClipboard}>クリップボードにコピー</button
+		>
 	</div>
 	<div>
-		<button onclick={describeTranslate}>中国語（簡体）</button>
-		{#if describeTranslateHTML}
-			<div class="markdown-container">
-				{@html describeTranslateHTML}
-			</div>
-		{/if}
+		<button data-processor="describe" data-target-language="en" onclick={handleTranslate}>
+			English
+		</button>
+		<button data-processor="describe" data-target-language="zh-CN" onclick={handleTranslate}>
+			中国語（簡体）
+		</button>
 	</div>
+	{#if describeTranslateHTML}
+		<div class="markdown-container">
+			{@html describeTranslateHTML}
+		</div>
+	{/if}
 	<hr />
 {/if}
 
 <button onclick={handleSolveMathGuide}>解答 (かいとう)</button>
-{#if solveGeneratedTexts}
+{#if solveGeneratedText}
 	<div class="markdown-container">
 		{@html solveHTML}
 	</div>
 	<div>
-		<button onclick={solveTextToClipboard}>クリップボードにコピー</button>
+		<button data-processor="solve" onclick={handleTextToClipboard}>クリップボードにコピー</button>
 	</div>
 	<div>
-		<button onclick={solveTranslate}>中国語（簡体）</button>
-		{#if solveTranslateHTML}
-			<div class="markdown-container">
-				{@html solveTranslateHTML}
-			</div>
-		{/if}
+		<button data-processor="solve" data-target-language="en" onclick={handleTranslate}>
+			English
+		</button>
+		<button data-processor="solve" data-target-language="zh-CN" onclick={handleTranslate}>
+			中国語（簡体）
+		</button>
 	</div>
+	{#if solveTranslateHTML}
+		<div class="markdown-container">
+			{@html solveTranslateHTML}
+		</div>
+	{/if}
 	<hr />
 {/if}
 
