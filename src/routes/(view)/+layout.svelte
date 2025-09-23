@@ -19,9 +19,10 @@
 	{#if page.url.pathname !== '/'}
 		<nav>
 			<a href="/">🏠️</a>
-			<a href="/text-from-image">🖼️</a>
-			<a href="/easier-expression">🔤</a>
+			<a href="text-from-image">🖼️</a>
+			<a href="easier-expression">🔤</a>
 			<a href="image-description">👀</a>
+			<a href="math-guide">⊿</a>
 			<a href="https://translate.google.com" target="_blank">🚪</a>
 		</nav>
 	{/if}

@@ -3,6 +3,7 @@
 		<li><a href="text-from-image">がぞうのぶんしょうをしゅとく</a></li>
 		<li><a href="easier-expression">やさしいことばにいいかえ</a></li>
 		<li><a href="image-description">がぞうをせつめい</a></li>
+		<li><a href="math-guide">すうがくをかいせつ</a></li>
 	</ul>
 </div>
 

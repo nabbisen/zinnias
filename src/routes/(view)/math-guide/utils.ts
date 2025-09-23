@@ -1,16 +1,17 @@
-export async function generateEasierExpression(text: string, proficiencyLevel: number): Promise<string> {
-    const response: Response | void = await fetch('/api/easier-expression', {
+export async function generateMathGuide(file: File, processor: string): Promise<string> {
+    const formData = new FormData()
+    formData.append('image', file, file.name)
+    formData.append('processor', processor)
+
+    const response: Response | void = await fetch('/api/math-guide', {
         method: 'POST',
         headers: {
             "CF-TURNSTILE-RESPONSE": (document.querySelector("input[name=\"cf-turnstile-response\"]") as unknown as HTMLInputElement).value
         },
-        body: JSON.stringify({
-            text,
-            proficiencyLevel,
-        }),
+        body: formData,
     }).catch((error) => {
-        console.error('クエリ中にエラーが発生しました:', error)
-        alert('クエリに失敗しました。')
+        console.error('アップロード中にエラーが発生しました:', error)
+        alert('アップロードに失敗しました。')
     })
 
     if (!response) return ""
@@ -20,6 +21,5 @@ export async function generateEasierExpression(text: string, proficiencyLevel: n
     }
 
     const responseJson: Record<string, any> = await response.json()
-
     return responseJson.generatedText as string
 }
