@@ -22,17 +22,16 @@
 	}
 </script>
 
-<h2>やさしいことばにいいかえ</h2>
-
-<select bind:value={proficiencyLevel}>
-	{#each PROFICIENCY_LEVELS as p}
-		<option value={p.level}>{p.label}</option>
-	{/each}
-</select>
+<h2>やさしい日本語にいいかえ</h2>
 
 <textarea maxlength="500" bind:value={text}></textarea>
 
 <div>
+	<select bind:value={proficiencyLevel}>
+		{#each PROFICIENCY_LEVELS as p}
+			<option value={p.level}>{p.label}</option>
+		{/each}
+	</select>
 	<button onclick={handleEasierExpression} disabled={text.length === 0}>やさしいひょうげん</button>
 </div>
 
@@ -44,5 +43,11 @@
 	textarea {
 		min-width: 21em;
 		min-height: 6em;
+		margin-bottom: 0.8rem;
+	}
+
+	div {
+		display: flex;
+		gap: 0.5rem;
 	}
 </style>
