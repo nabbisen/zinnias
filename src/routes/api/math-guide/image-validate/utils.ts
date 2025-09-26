@@ -4,7 +4,7 @@ import { type GenerateContentCandidate, type Part } from '@google-cloud/vertexai
 import { imageProcess } from '$lib/api/math-guide';
 
 // export const POST: RequestHandler = async ({ params, platform, request }) => {
-export async function mathGuideImageValidate(platformEnv: Env | undefined, base64Image: string): Promise<boolean> {
+export async function mathGuideImageValidate(platformEnv: Env | undefined, imageBase64: string): Promise<boolean> {
     const prompt: Part[] = [
         { text: '画像が学習教材の数学の問題かどうかを分析して、それが true である場合、回答を 1 とする。それ以外の場合、回答を 0 とする。' },
         { text: '回答は単一の数値で生成する。それ以外のものは一切出力しない。' },
@@ -12,7 +12,7 @@ export async function mathGuideImageValidate(platformEnv: Env | undefined, base6
 
     let candidate: GenerateContentCandidate
     try {
-        candidate = await imageProcess(platformEnv, prompt, base64Image)
+        candidate = await imageProcess(platformEnv, prompt, imageBase64)
     } catch (error: any) {
         throw error
     }

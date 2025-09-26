@@ -2,7 +2,7 @@ import { DEFAULT_GENERATIVE_MODEL } from "$lib/constants/api/math-guide";
 import { type GenerateContentCandidate, type Part } from "@google-cloud/vertexai";
 import { generativeModel } from ".";
 
-export async function imageAnalyze(platformEnv: Env | undefined, text: string, base64Image: string): Promise<GenerateContentCandidate> {
+export async function imageAnalyze(platformEnv: Env | undefined, text: string, imageBase64: string): Promise<GenerateContentCandidate> {
     if (!platformEnv || !platformEnv.GOOGLE_APPLICATION_CREDENTIALS_JSON) {
         console.error('API 認証情報が設定されていません。');
         throw 'サーバー設定エラー (status: 500)'
@@ -23,7 +23,7 @@ export async function imageAnalyze(platformEnv: Env | undefined, text: string, b
         {
             inlineData: {
                 mimeType: "image/webp",
-                data: base64Image,
+                data: imageBase64,
             },
         },
         { text: '【結果の例 1】小問が含まれている場合: {leading:"...",questions:["(1) ...","(2) ..."],trailing:"",hasDiagram:false}' },

@@ -2,7 +2,7 @@ import { DEFAULT_GENERATIVE_MODEL, PROMPT_START_WITH_IMAGE } from "$lib/constant
 import { VertexAI, type GenerateContentCandidate, type GenerativeModel, type Part } from "@google-cloud/vertexai";
 import { json } from "@sveltejs/kit";
 
-export async function imageProcess(platformEnv: Env | undefined, prompt: Part[], base64Image: string, model?: string): Promise<GenerateContentCandidate> {
+export async function imageProcess(platformEnv: Env | undefined, prompt: Part[], imageBase64: string, model?: string): Promise<GenerateContentCandidate> {
     if (!platformEnv || !platformEnv.GOOGLE_APPLICATION_CREDENTIALS_JSON) {
         console.error('API 認証情報が設定されていません。');
         throw json({ error: 'サーバー設定エラー' }, { status: 500 });
@@ -12,7 +12,7 @@ export async function imageProcess(platformEnv: Env | undefined, prompt: Part[],
 
     const m = generativeModel(credentials, model)
 
-    const inputImagePrompt = await imageToInputImagePrompt(base64Image)
+    const inputImagePrompt = await imageToInputImagePrompt(imageBase64)
 
     const p = {
         contents: [
@@ -52,13 +52,13 @@ export function generativeModel(credentials: Record<string, any>, model?: string
     return generativeModel
 }
 
-async function imageToInputImagePrompt(base64Image: string): Promise<Part[]> {
+async function imageToInputImagePrompt(imageBase64: string): Promise<Part[]> {
     const inputImagePrompt: Part[] = [
         { text: PROMPT_START_WITH_IMAGE },
         {
             inlineData: {
                 mimeType: "image/webp",
-                data: base64Image,
+                data: imageBase64,
             },
         },
     ]

@@ -2,7 +2,7 @@ import { accessToken } from '$lib/auth/googleapis';
 
 const API_ENDPOINT = `https://vision.googleapis.com/v1/images:annotate`;
 
-export async function mathGuideTextFromImage(platformEnv: Env | undefined, base64Image: string): Promise<string> {
+export async function mathGuideTextFromImage(platformEnv: Env | undefined, imageBase64: string): Promise<string> {
     if (!platformEnv?.GOOGLE_APPLICATION_CREDENTIALS_JSON) {
         console.error('API 認証情報が設定されていません。');
         throw `サーバー設定エラー (status: 500)`
@@ -16,7 +16,7 @@ export async function mathGuideTextFromImage(platformEnv: Env | undefined, base6
         requests: [
             {
                 image: {
-                    content: base64Image
+                    content: imageBase64
                 },
                 features: [{ type: 'DOCUMENT_TEXT_DETECTION' }],
             }
