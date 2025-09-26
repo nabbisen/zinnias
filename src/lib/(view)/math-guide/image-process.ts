@@ -6,9 +6,8 @@ export async function generateMathGuide(file: File, processor: string): Promise<
 
     const formData = new FormData()
     formData.append('image', file, file.name)
-    formData.append('processor', processor)
 
-    const response: Response | void = await fetch('/api/math-guide', {
+    const response: Response | void = await fetch(`/api/math-guide/${processor}`, {
         method: 'POST',
         headers: {
             "CF-TURNSTILE-RESPONSE": (document.querySelector("input[name=\"cf-turnstile-response\"]") as unknown as HTMLInputElement).value

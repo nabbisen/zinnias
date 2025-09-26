@@ -1,11 +1,11 @@
 import { json, text } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-import { validateTurnstile } from '$lib/utils/turnstile';
+import { validateTurnstile } from '$lib/api/common/turnstile';
 import { Translate } from '@google-cloud/translate/build/src/v2';
 
 // export const POST: RequestHandler = async ({ params, platform, request }) => {
 export const POST: RequestHandler = async ({ request, platform }) => {
-    if (!await validateTurnstile(request.headers)) return json({ error: 'リクエストトークンが不正です。' }, { status: 403 });
+    if (!await validateTurnstile(platform?.env.CLOUDFLARE_TURNSTILE_SECRET || "", request.headers)) return json({ error: 'リクエストトークンが不正です。' }, { status: 403 });
 
     const requestJson = await request.json() as Record<string, any>
     const text = requestJson.text
