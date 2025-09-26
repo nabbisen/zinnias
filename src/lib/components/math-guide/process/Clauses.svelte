@@ -4,7 +4,7 @@
 	import type { ClauseItem } from '$lib/types/(view)/math-guide/clause-parse'
 	import { copyToClipboard } from '$lib/utils/(view)'
 
-	const { selectedFile }: { selectedFile: File } = $props()
+	const { file }: { file: File } = $props()
 
 	let clauses: ClauseItem[] = $state([])
 
@@ -13,7 +13,7 @@
 
 	async function handle() {
 		try {
-			clauses = ((await clauseParse(selectedFile)) as unknown as { clauses: ClauseItem[] }).clauses
+			clauses = ((await clauseParse(file)) as unknown as { clauses: ClauseItem[] }).clauses
 		} catch (error) {
 			messages.pushError(error as string)
 			return

@@ -1,11 +1,12 @@
 <script lang="ts">
 	import { compressImage, copyToClipboard } from '$lib/utils/(view)'
 	import { translate } from '$lib/(view)/common/translate'
-	import { generateMathGuide, imageValidateAnalyze } from '$lib/(view)/math-guide/image-process'
+	import { generateMathGuide } from '$lib/(view)/math-guide/image-process'
 	import { messages } from '$lib/stores/message-center.svelte'
 	import Usage from '$lib/components/math-guide/Usage.svelte'
 	import Clauses from '$lib/components/math-guide/process/Clauses.svelte'
 	import { markdownToMathHTML } from '$lib/utils/(view)/math-guide'
+	import ImageSelect from '$lib/components/math-guide/ImageSelect.svelte'
 
 	let imgSrc = $state('')
 	let showImgSrc = $state(false)
@@ -18,22 +19,14 @@
 	let solveTranslateHTML = $state('')
 	let showsUsage = $state(false)
 
-	let selectedFile: File | null = $state(null)
+	let file: File | null = $state(null)
 
-	function handleFileChange(
-		e: Event & {
-			currentTarget: EventTarget & HTMLInputElement
-		}
-	) {
-		if (!e.currentTarget.files) {
-			return
-		}
-		const file = e.currentTarget.files[0]
-		selectedFile = file
+	function fileOnchange(changed: File) {
+		file = changed
 	}
 
 	function handleMathGuide(processor: string) {
-		if (!selectedFile) {
+		if (!file) {
 			messages.pushWarn('イメージがえらばれていません')
 			return
 		}
@@ -42,7 +35,7 @@
 			compressImageSuccessCallback(file, processor)
 		}
 
-		compressImage(selectedFile, successCallback, compressImageErrorCallback)
+		compressImage(file, successCallback, compressImageErrorCallback)
 	}
 
 	async function compressImageSuccessCallback(file: File, processor: string) {
@@ -168,19 +161,11 @@
 {/if}
 
 <h3>がぞうをしてい</h3>
-<div>
-	<input type="file" onchange={handleFileChange} />
-</div>
 
-<button
-	onclick={async () => {
-		const ret = await imageValidateAnalyze(selectedFile!)
-		console.log(234123, ret)
-	}}>かいせき (todo)</button
->
+<ImageSelect {fileOnchange} />
 
-{#if selectedFile}
-	<Clauses {selectedFile} />
+{#if file}
+	<Clauses {file} />
 {/if}
 
 <button onclick={handleDescribeMathGuide}>題意 (だいい) と ときかた</button>

@@ -34,13 +34,6 @@ export async function generateMathGuide(file: File, processor: string): Promise<
 }
 
 
-export async function imageValidateAnalyze(file: File): Promise<string> {
-    const formData = new FormData()
-    formData.append('image', file, file.name)
-
-    const responseJson = await postFormData('/api/math-guide/image-validate-analyze', formData)
-    return responseJson.analyzed
-}
 
 export async function clauseParse(file: File): Promise<ClauseItem[]> {
     const formData = new FormData()
