@@ -7,6 +7,7 @@
 	import Clauses from '$lib/components/math-guide/process/Clauses.svelte'
 	import { markdownToMathHTML } from '$lib/utils/(view)/math-guide'
 	import ImageSelect from '$lib/components/math-guide/ImageSelect.svelte'
+	import type { MathImageContent } from '$lib/types/(view)/math-guide/image'
 
 	let imgSrc = $state('')
 	let showImgSrc = $state(false)
@@ -21,8 +22,11 @@
 
 	let file: File | null = $state(null)
 
-	function fileOnchange(changed: File) {
-		file = changed
+	let imageContent: MathImageContent | null = $state(null)
+
+	function fileOnchange(f: File | null, c: MathImageContent | null) {
+		file = f
+		imageContent = c
 	}
 
 	function handleMathGuide(processor: string) {

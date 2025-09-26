@@ -1,15 +1,8 @@
-import { PROMPT_START_WITH_IMAGE } from "$lib/constants/api/math-guide";
+import { DEFAULT_GENERATIVE_MODEL, PROMPT_START_WITH_IMAGE } from "$lib/constants/api/math-guide";
 import { VertexAI, type GenerateContentCandidate, type GenerativeModel, type Part } from "@google-cloud/vertexai";
 import { json } from "@sveltejs/kit";
-import { validateTurnstile } from "../common/turnstile";
 
-const DEFAULT_GENERATIVE_MODEL = 'gemini-2.5-flash-lite'
-
-export async function process(platformEnv: Env | undefined, headers: Headers, prompt: Part[], image: File, model?: string): Promise<GenerateContentCandidate> {
-    if (!await validateTurnstile(platformEnv?.CLOUDFLARE_TURNSTILE_SECRET || "", headers)) {
-        throw json({ error: 'リクエストトークンが不正です。' }, { status: 403 })
-    }
-
+export async function imageProcess(platformEnv: Env | undefined, prompt: Part[], base64Image: string, model?: string): Promise<GenerateContentCandidate> {
     if (!platformEnv || !platformEnv.GOOGLE_APPLICATION_CREDENTIALS_JSON) {
         console.error('API 認証情報が設定されていません。');
         throw json({ error: 'サーバー設定エラー' }, { status: 500 });
@@ -19,7 +12,7 @@ export async function process(platformEnv: Env | undefined, headers: Headers, pr
 
     const m = generativeModel(credentials, model)
 
-    const inputImagePrompt = await imageToInputImagePrompt(image)
+    const inputImagePrompt = await imageToInputImagePrompt(base64Image)
 
     const p = {
         contents: [
@@ -43,7 +36,7 @@ export async function process(platformEnv: Env | undefined, headers: Headers, pr
     return result.response.candidates[0]
 }
 
-function generativeModel(credentials: Record<string, any>, model?: string): GenerativeModel {
+export function generativeModel(credentials: Record<string, any>, model?: string): GenerativeModel {
     const vertex_ai = new VertexAI({
         project: credentials.project_id,
         location: credentials.location,
@@ -59,16 +52,13 @@ function generativeModel(credentials: Record<string, any>, model?: string): Gene
     return generativeModel
 }
 
-async function imageToInputImagePrompt(image: File): Promise<Part[]> {
-    const imageBuffer = await image.arrayBuffer();
-    const imageBase64 = Buffer.from(imageBuffer).toString('base64');
-
+async function imageToInputImagePrompt(base64Image: string): Promise<Part[]> {
     const inputImagePrompt: Part[] = [
         { text: PROMPT_START_WITH_IMAGE },
         {
             inlineData: {
-                mimeType: image.type,
-                data: imageBase64,
+                mimeType: "image/webp",
+                data: base64Image,
             },
         },
     ]

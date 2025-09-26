@@ -1,10 +1,16 @@
 import { json, text } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { type Part } from '@google-cloud/vertexai';
-import { process } from '$lib/api/math-guide';
+import { imageProcess } from '$lib/api/math-guide';
+import { validateTurnstile } from '$lib/api/common/turnstile';
+import { imageFileToBase64 } from '$lib/utils/encode-decode';
 
 // export const POST: RequestHandler = async ({ params, platform, request }) => {
 export const POST: RequestHandler = async ({ request, platform }) => {
+    if (!await validateTurnstile(platform?.env.CLOUDFLARE_TURNSTILE_SECRET || "", request.headers)) {
+        throw json({ error: 'リクエストトークンが不正です。' }, { status: 403 })
+    }
+
     const formData = await request.formData()
     const image = formData.get("image")
 
@@ -23,15 +29,10 @@ export const POST: RequestHandler = async ({ request, platform }) => {
         { text: '【回答の具体例】 {clauses:[{txt:"ここは",kana:"ここは、",desc:"(説明)"}},{txt:"快適だ",kana:"カイテキ だ",desc:"(説明)"}]}' },
     ]
 
-    const candidate = await process(platform?.env as Env, request.headers, prompt, image)
+    const candidate = await imageProcess(platform?.env as Env, prompt, await imageFileToBase64(image))
 
-    let jsonStr = candidate.content.parts.map((part) => part.text).join("").replace(/^```json/, "").replace(/```$/, "")
+    const jsonStr = candidate.content.parts.map((part) => part.text).join("").replace(/^```json/, "").replace(/```$/, "")
+    const result = JSON.parse(jsonStr)
 
-    return json({ result: JSON.parse(jsonStr) })
+    return json({ result })
 }
-
-// todo: necessay ? can be removed ?
-// This handler will respond to PUT, PATCH, DELETE, etc.
-export const fallback: RequestHandler = async ({ request }) => {
-    return text(`I caught your ${request.method} request!`)
-};

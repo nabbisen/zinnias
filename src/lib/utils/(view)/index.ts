@@ -1,11 +1,13 @@
 import Compressor from "compressorjs"
 
-export function compressImage(file: File, successCallback: (file: File) => void, errorCallback: (err: Error) => void | null) {
+const DEFAULT_MAX_DIMENSION = 1024
+
+export function compressImage(file: File, successCallback: (file: File) => void, errorCallback: ((err: Error) => void) | null, maxDimension?: number) {
     new Compressor(file, {
-        quality: 0.7,
-        maxWidth: 1280,
-        maxHeight: 1280,
-        mimeType: 'image/jpeg',
+        quality: 0.8,
+        maxWidth: maxDimension ?? DEFAULT_MAX_DIMENSION,
+        maxHeight: maxDimension ?? DEFAULT_MAX_DIMENSION,
+        mimeType: 'image/webp',
 
         success(file: File) {
             successCallback(file)

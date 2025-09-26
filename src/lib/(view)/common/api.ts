@@ -1,6 +1,6 @@
 import { loading } from "$lib/stores/loading-effect.svelte"
 
-export async function postFormData(path: string, formData: FormData): Promise<Record<string, any>> {
+export async function postFormData(path: string, formData: FormData): Promise<Record<string, unknown>> {
     loading.start()
 
     const response: Response | void = await fetch(path, {

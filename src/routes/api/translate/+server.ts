@@ -1,4 +1,4 @@
-import { json, text } from '@sveltejs/kit';
+import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { validateTurnstile } from '$lib/api/common/turnstile';
 import { Translate } from '@google-cloud/translate/build/src/v2';
@@ -36,10 +36,4 @@ export const POST: RequestHandler = async ({ request, platform }) => {
         console.error('Translation error:', error);
         return json({ error: 'ほんやくにしっぱい' }, { status: 500 });
     }
-};
-
-// todo: necessay ? can be removed ?
-// This handler will respond to PUT, PATCH, DELETE, etc.
-export const fallback: RequestHandler = async ({ request }) => {
-    return text(`I caught your ${request.method} request!`)
-};
+}

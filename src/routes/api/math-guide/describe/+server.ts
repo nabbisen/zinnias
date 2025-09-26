@@ -1,11 +1,17 @@
 
-import { json, text } from '@sveltejs/kit';
+import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { type Part } from '@google-cloud/vertexai';
-import { process } from '$lib/api/math-guide';
+import { imageProcess } from '$lib/api/math-guide';
+import { validateTurnstile } from '$lib/api/common/turnstile';
+import { imageFileToBase64 } from '$lib/utils/encode-decode';
 
 // export const POST: RequestHandler = async ({ params, platform, request }) => {
 export const POST: RequestHandler = async ({ request, platform }) => {
+    if (!await validateTurnstile(platform?.env.CLOUDFLARE_TURNSTILE_SECRET || "", request.headers)) {
+        throw json({ error: 'リクエストトークンが不正です。' }, { status: 403 })
+    }
+
     const formData = await request.formData()
     const image = formData.get("image")
 
@@ -22,15 +28,9 @@ export const POST: RequestHandler = async ({ request, platform }) => {
         { text: '【回答条件】回答は日本語で生成する。回答内容は生成文章のみに限定して、あなた自身のメッセージは含めない。' },
     ]
 
-    const candidate = await process(platform?.env as Env, request.headers, prompt, image)
+    const candidate = await imageProcess(platform?.env as Env, prompt, await imageFileToBase64(image))
 
     const generatedText = candidate.content.parts.map((part) => part.text).join("")
 
     return json({ generatedText })
 }
-
-// todo: necessay ? can be removed ?
-// This handler will respond to PUT, PATCH, DELETE, etc.
-export const fallback: RequestHandler = async ({ request }) => {
-    return text(`I caught your ${request.method} request!`)
-};
