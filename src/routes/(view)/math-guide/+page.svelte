@@ -7,11 +7,11 @@
 	import katex from 'katex'
 	import { messages } from '$lib/stores/message-center.svelte'
 	import Usage from '$lib/components/math-guide/Usage.svelte'
+	import Clauses from '$lib/components/math-guide/process/Clauses.svelte'
 
 	let imgSrc = $state('')
 	let showImgSrc = $state(false)
-	let readGeneratedText = $state('')
-	let readHTML = $state('')
+
 	let describeGeneratedText = $state('')
 	let describeHTML = $state('')
 	let describeTranslateHTML = $state('')
@@ -20,7 +20,7 @@
 	let solveTranslateHTML = $state('')
 	let showsUsage = $state(false)
 
-	let selectedFile: File | null = null
+	let selectedFile: File | null = $state(null)
 
 	function handleFileChange(
 		e: Event & {
@@ -66,11 +66,6 @@
 		const retHTML = await markdownToMathHTML(ret)
 
 		switch (processor) {
-			case 'read': {
-				readGeneratedText = ret
-				readHTML = retHTML
-				break
-			}
 			case 'describe': {
 				describeGeneratedText = ret
 				describeHTML = retHTML
@@ -121,10 +116,6 @@
 		messages.pushError('画像の圧縮中にエラーが発生しました:', error.message)
 	}
 
-	function handleReadMathGuide() {
-		handleMathGuide('read')
-	}
-
 	function handleDescribeMathGuide() {
 		handleMathGuide('describe')
 	}
@@ -170,10 +161,6 @@
 
 		let text = ''
 		switch (processor) {
-			case 'read': {
-				text = readGeneratedText
-				break
-			}
 			case 'describe': {
 				text = describeGeneratedText
 				break
@@ -224,18 +211,11 @@
 	onclick={async () => {
 		const ret = await imageValidateAnalyze(selectedFile!)
 		console.log(234123, ret)
-	}}>TEST</button
+	}}>かいせき (todo)</button
 >
 
-<button onclick={handleReadMathGuide}>もんだいぶん の にほんご</button>
-{#if readGeneratedText}
-	<div class="markdown-container">
-		{@html readHTML}
-	</div>
-	<div>
-		<button data-processor="read" onclick={handleTextToClipboard}>クリップボードにコピー</button>
-	</div>
-	<hr />
+{#if selectedFile}
+	<Clauses {selectedFile} />
 {/if}
 
 <button onclick={handleDescribeMathGuide}>題意 (だいい) と ときかた</button>

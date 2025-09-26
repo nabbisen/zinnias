@@ -1,4 +1,4 @@
-import type { Message, MessageLevel } from "$lib/types/message-center"
+import type { Message, MessageLevel } from "$lib/types/(view)/common/message-center"
 
 const state: { messages: Message[] } = $state({
     messages: []
