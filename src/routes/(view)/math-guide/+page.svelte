@@ -1,10 +1,12 @@
 <script lang="ts">
-	import { compressImage, copyToClipboard } from '$lib/utils'
+	import { compressImage, copyToClipboard } from '$lib/utils/(view)'
 	import { marked } from 'marked'
-	import { generateMathGuide, translate } from './utils'
+	import { translate } from '$lib/(view)/common/translate'
+	import { generateMathGuide, imageValidateAnalyze } from '$lib/(view)/math-guide/image-process'
 	import dompurify from 'dompurify'
 	import katex from 'katex'
 	import { messages } from '$lib/stores/message-center.svelte'
+	import Usage from '$lib/components/math-guide/Usage.svelte'
 
 	let imgSrc = $state('')
 	let showImgSrc = $state(false)
@@ -16,6 +18,7 @@
 	let solveGeneratedText = $state('')
 	let solveHTML = $state('')
 	let solveTranslateHTML = $state('')
+	let showsUsage = $state(false)
 
 	let selectedFile: File | null = null
 
@@ -152,7 +155,7 @@
 				break
 			}
 			default: {
-				messages.pushError('よきせぬえらーです')
+				messages.pushError('よきせぬエラーです')
 				break
 			}
 		}
@@ -180,7 +183,7 @@
 				break
 			}
 			default: {
-				messages.pushError('よきせぬえらーです')
+				messages.pushError('よきせぬエラーです')
 				break
 			}
 		}
@@ -199,28 +202,30 @@
 
 <h2>すうがくをかいせつ</h2>
 
-<h3>使い方</h3>
-<p>
-	問題をスマートフォンのカメラでとって、ここでえらんでください。そのあとに、下のボタンを押してください。
-</p>
-<h4>注意</h4>
-<ul>
-	<li>写真は、はっきりとうつっていること。</li>
-	<li>かんけいのないところは、がぞうへんしゅうで、とりのぞかれていること。</li>
-</ul>
+<label>
+	つかいかた
+	<input type="checkbox" bind:checked={showsUsage} />
+</label>
+{#if showsUsage}
+	<Usage />
+	<input
+		style="position: fixed; right: 1rem; top: 1rem; z-index: 20000;"
+		type="checkbox"
+		bind:checked={showsUsage}
+	/>
+{/if}
 
 <h3>がぞうをしてい</h3>
 <div>
 	<input type="file" onchange={handleFileChange} />
 </div>
 
-<h3>そうさ</h3>
-<p>がぞうをよみこんで、なにをしましょうか。</p>
-<ul>
-	<li>もんだいぶんのにほんごのせつめいをします。日本語をべんきょうちゅうの人むけです。</li>
-	<li>数学の問題の内容と、ときかたをせつめいします。答えはしめしません。</li>
-	<li>数学の問題をじっさいに解いてしめします。</li>
-</ul>
+<button
+	onclick={async () => {
+		const ret = await imageValidateAnalyze(selectedFile!)
+		console.log(234123, ret)
+	}}>TEST</button
+>
 
 <button onclick={handleReadMathGuide}>もんだいぶん の にほんご</button>
 {#if readGeneratedText}

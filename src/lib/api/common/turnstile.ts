@@ -1,16 +1,16 @@
 const CLOUDFLARE_TURNSTILE_VERIFY_ENDPOINT = 'https://challenges.cloudflare.com/turnstile/v0/siteverify';
 
-export async function validateTurnstile(headers: Headers): Promise<boolean> {
+export async function validateTurnstile(secret: string, headers: Headers): Promise<boolean> {
     const token = headers.get('CF-TURNSTILE-RESPONSE') ?? ""
     const ip = headers.get('CF-Connecting-IP') ||
         headers.get('X-Forwarded-For') ||
         'unknown';
-    return validateToken(token, ip)
+    return validateToken(secret, token, ip)
 }
 
-async function validateToken(token: string, remoteip: string): Promise<boolean> {
+async function validateToken(secret: string, token: string, remoteip: string): Promise<boolean> {
     const formData = new FormData();
-    formData.append('secret', process.env.CLOUDFLARE_TURNSTILE_SECRET);
+    formData.append('secret', secret);
     formData.append('response', token);
     formData.append('remoteip', remoteip);
 

@@ -1,0 +1,77 @@
+import { PROMPT_START_WITH_IMAGE } from "$lib/constants/api/math-guide";
+import { VertexAI, type GenerateContentCandidate, type GenerativeModel, type Part } from "@google-cloud/vertexai";
+import { json } from "@sveltejs/kit";
+import { validateTurnstile } from "../common/turnstile";
+
+const DEFAULT_GENERATIVE_MODEL = 'gemini-2.5-flash-lite'
+
+export async function process(platformEnv: Env | undefined, headers: Headers, prompt: Part[], image: File, model?: string): Promise<GenerateContentCandidate> {
+    if (!await validateTurnstile(platformEnv?.CLOUDFLARE_TURNSTILE_SECRET || "", headers)) {
+        throw json({ error: 'リクエストトークンが不正です。' }, { status: 403 })
+    }
+
+    if (!platformEnv || !platformEnv.GOOGLE_APPLICATION_CREDENTIALS_JSON) {
+        console.error('API 認証情報が設定されていません。');
+        throw json({ error: 'サーバー設定エラー' }, { status: 500 });
+    }
+
+    const credentials = JSON.parse(platformEnv.GOOGLE_APPLICATION_CREDENTIALS_JSON);
+
+    const m = generativeModel(credentials, model)
+
+    const inputImagePrompt = await imageToInputImagePrompt(image)
+
+    const p = {
+        contents: [
+            {
+                role: 'user',
+                parts: [
+                    ...inputImagePrompt,
+                    ...prompt,
+                ]
+            }
+        ]
+    }
+
+    const result = await m.generateContent(p);
+
+    if (!result.response.candidates) {
+        console.error('生成に失敗しました。');
+        throw json({ error: 'サーバー処理エラー' }, { status: 500 });
+    }
+
+    return result.response.candidates[0]
+}
+
+function generativeModel(credentials: Record<string, any>, model?: string): GenerativeModel {
+    const vertex_ai = new VertexAI({
+        project: credentials.project_id,
+        location: credentials.location,
+        googleAuthOptions: {
+            credentials,
+        },
+    });
+
+    const generativeModel = vertex_ai.getGenerativeModel({
+        model: model || DEFAULT_GENERATIVE_MODEL,
+    });
+
+    return generativeModel
+}
+
+async function imageToInputImagePrompt(image: File): Promise<Part[]> {
+    const imageBuffer = await image.arrayBuffer();
+    const imageBase64 = Buffer.from(imageBuffer).toString('base64');
+
+    const inputImagePrompt: Part[] = [
+        { text: PROMPT_START_WITH_IMAGE },
+        {
+            inlineData: {
+                mimeType: image.type,
+                data: imageBase64,
+            },
+        },
+    ]
+
+    return inputImagePrompt
+}

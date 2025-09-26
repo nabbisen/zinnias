@@ -1,4 +1,5 @@
 import { loading } from "$lib/stores/loading-effect.svelte"
+import { postFormData } from "../common/api"
 
 export async function generateMathGuide(file: File, processor: string): Promise<string> {
     loading.start()
@@ -32,34 +33,11 @@ export async function generateMathGuide(file: File, processor: string): Promise<
     return responseJson.generatedText as string
 }
 
-export async function translate(text: string, targetLanguage: string): Promise<string> {
-    loading.start()
 
-    const response: Response | void = await fetch('/api/translate', {
-        method: 'POST',
-        headers: {
-            "CF-TURNSTILE-RESPONSE": (document.querySelector("input[name=\"cf-turnstile-response\"]") as unknown as HTMLInputElement).value
-        },
-        body: JSON.stringify({
-            text,
-            targetLanguage,
-        }),
-    }).catch((error) => {
-        throw new Error('クエリ中にエラーが発生しました:', error)
-    }).finally(() => {
-        turnstile.reset()
-        loading.stop()
-    })
+export async function imageValidateAnalyze(file: File): Promise<string> {
+    const formData = new FormData()
+    formData.append('image', file, file.name)
 
-    if (!response) {
-        throw new Error('クエリ応答が空でした')
-    }
-
-    if (!response.ok) {
-        throw new Error(`クエリに失敗しました: ${response.body} (status = ${response.status})`)
-    }
-
-    const responseJson: Record<string, any> = await response.json()
-
-    return responseJson.translation as string
+    const responseJson = await postFormData('/api/math-guide/image-validate-analyze', formData)
+    return responseJson.analyzed
 }

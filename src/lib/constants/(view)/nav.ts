@@ -1,6 +1,5 @@
 import type { NavMenu } from "$lib/types/nav";
 
-
 export const NAV_MENUS: NavMenu[] = [
     {
         icon: "⊿",
