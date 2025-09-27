@@ -1,30 +1,30 @@
 <script lang="ts">
-	import type { MathGuideQuestion } from '$lib/types/(view)/math-guide/question'
+	import type { MathGuideQuestionStep } from '$lib/types/(view)/math-guide/math-step'
 	import Describe from './question/Describe.svelte'
-	import ClauseParse from './question/read/ClauseParse.svelte'
+	import ClauseParse from './read/ClauseParse.svelte'
 
-	const { question }: { question: MathGuideQuestion } = $props()
+	const { questionStep }: { questionStep: MathGuideQuestionStep } = $props()
 
 	let clauseText: string = $state('')
-	let describeQuestion: MathGuideQuestion | null = $state(null)
+	let describeQuestionStep: MathGuideQuestionStep | null = $state(null)
 
 	async function handleClauseParse() {
-		clauseText = question.imageWholeText ?? ''
+		clauseText = questionStep.imageWholeText ?? ''
 	}
 
 	function handleDescribe() {
-		describeQuestion = question
+		describeQuestionStep = questionStep
 	}
 	function handleExplain() {}
 	function handleSolve() {}
 </script>
 
-{#if question.imageWholeText !== question.question}
-	<div><small>{question.imageWholeText}</small></div>
+{#if questionStep.imageWholeText !== questionStep.question}
+	<div><small>{questionStep.imageWholeText}</small></div>
 {/if}
 
 <h3>問題</h3>
-<div>{question.question}</div>
+<div>{questionStep.question}</div>
 
 <div>
 	<button onclick={handleClauseParse}>にほんご</button>
@@ -35,4 +35,4 @@
 </div>
 
 <ClauseParse text={clauseText} />
-<Describe question={describeQuestion} />
+<Describe questionStep={describeQuestionStep} />

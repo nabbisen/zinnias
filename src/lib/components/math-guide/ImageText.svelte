@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { MathGuideImageText } from '$lib/types/(view)/math-guide/question'
+	import type { MathGuideImageText } from '$lib/types/(view)/math-guide/math-step'
 
 	const { question }: { question: MathGuideImageText } = $props()
 

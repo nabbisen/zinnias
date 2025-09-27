@@ -1,6 +1,6 @@
 import type { ImageTextData } from "../common/image";
 
-export interface MathGuideQuestion {
+export interface MathGuideQuestionStep {
     question: string,
     hasDiagram: boolean,
     image: ImageTextData,

@@ -8,9 +8,9 @@
 	// import { markdownToMathHTML } from '$lib/utils/(view)/math-guide'
 	import ImageSelect from '$lib/components/math-guide/ImageSelect.svelte'
 	import type { MathImageContent } from '$lib/types/(view)/math-guide/image'
-	import Question from '$lib/components/math-guide/Question.svelte'
 	import ImageText from '$lib/components/math-guide/ImageText.svelte'
 	import type { ImageTextData } from '$lib/types/(view)/common/image'
+	import QuestionSteps from '$lib/components/math-guide/QuestionSteps.svelte'
 
 	let showsUsage = $state(false)
 
@@ -61,8 +61,8 @@
 		/>
 		{#each imageContent.questions as question}
 			<hr />
-			<Question
-				question={{
+			<QuestionSteps
+				questionStep={{
 					question: question,
 					hasDiagram: imageContent.hasDiagram,
 					image: imageTextData!,
@@ -71,8 +71,8 @@
 			/>
 		{/each}
 	{:else}
-		<Question
-			question={{
+		<QuestionSteps
+			questionStep={{
 				question: imageText(),
 				hasDiagram: imageContent.hasDiagram,
 				image: imageTextData!,

@@ -1,21 +1,20 @@
 <script lang="ts">
 	import { describe } from '$lib/(view)/math-guide/describe'
-	import { clauseParse } from '$lib/(view)/math-guide/read/clause'
 	import CopyToClipboard from '$lib/components/common/CopyToClipboard.svelte'
 	import Translate from '$lib/components/translate/Translate.svelte'
 	import { messages } from '$lib/stores/message-center.svelte'
-	import type { MathGuideQuestion } from '$lib/types/(view)/math-guide/question'
+	import type { MathGuideQuestionStep } from '$lib/types/(view)/math-guide/math-step'
 	import { markdownToMathHTML } from '$lib/utils/(view)/math-guide'
 
-	const { question }: { question: MathGuideQuestion | null } = $props()
+	const { questionStep }: { questionStep: MathGuideQuestionStep | null } = $props()
 
 	let generatedText = $state('')
 	let generatedTextHTML = $state('')
 
 	$effect(() => {
-		if (!question?.question.trim()) return
+		if (!questionStep?.question.trim()) return
 
-		describe(question)
+		describe(questionStep)
 			.then((result) => {
 				generatedText = result
 				markdownToMathHTML(generatedText)
