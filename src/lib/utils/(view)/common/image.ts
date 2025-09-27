@@ -4,6 +4,7 @@ export function imageTextDataToDataUrl(imageTextData: ImageTextData): string {
     return `data:${imageTextData.mime};base64,${imageTextData.base64}`
 }
 
+// note: currently unused:
 // export function imageTextDataToBlob(imageTextData: ImageTextData): Blob {
 //     const bstr = atob(imageTextData.base64)
 //     let n = bstr.length

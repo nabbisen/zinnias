@@ -1,12 +1,16 @@
 <script lang="ts">
-	import type { MathGuideQuestionStep } from '$lib/types/(view)/math-guide/math-step'
-	import Describe from './question-step/Describe.svelte'
+	import type { MathGuideQuestionStep } from '$lib/types/(view)/math-guide/question-step'
+	import QuestionStepDescribe from './question-step/QuestionStepDescribe.svelte'
+	import QuestionStepExplain from './question-step/QuestionStepExplain.svelte'
+	import QuestionStepSolve from './question-step/QuestionStepSolve.svelte'
 	import ClauseParse from './read/ClauseParse.svelte'
 
 	const { questionStep }: { questionStep: MathGuideQuestionStep } = $props()
 
 	let clauseText: string = $state('')
 	let describeQuestionStep: MathGuideQuestionStep | null = $state(null)
+	let explainQuestionStep: MathGuideQuestionStep | null = $state(null)
+	let solveQuestionStep: MathGuideQuestionStep | null = $state(null)
 
 	async function handleClauseParse() {
 		clauseText = questionStep.imageWholeText ?? ''
@@ -15,8 +19,14 @@
 	function handleDescribe() {
 		describeQuestionStep = questionStep
 	}
-	function handleExplain() {}
-	function handleSolve() {}
+
+	function handleExplain() {
+		explainQuestionStep = questionStep
+	}
+
+	function handleSolve() {
+		solveQuestionStep = questionStep
+	}
 </script>
 
 {#if questionStep.imageWholeText !== questionStep.question}
@@ -29,10 +39,24 @@
 <div>
 	<button onclick={handleClauseParse}>にほんご</button>
 	<button onclick={() => (clauseText = '')}>Clear</button>
+
 	<button onclick={handleDescribe}>だいい</button>
+
 	<button onclick={handleExplain}>ときかた</button>
+
 	<button onclick={handleSolve}>かいとう</button>
 </div>
 
 <ClauseParse text={clauseText} />
-<Describe questionStep={describeQuestionStep} />
+{#if describeQuestionStep}
+	<h3>だいい</h3>
+	<QuestionStepDescribe questionStep={describeQuestionStep} />
+{/if}
+{#if explainQuestionStep}
+	<h3>ときかた</h3>
+	<QuestionStepExplain questionStep={explainQuestionStep} />
+{/if}
+{#if solveQuestionStep}
+	<h3>かいとう</h3>
+	<QuestionStepSolve questionStep={solveQuestionStep} />
+{/if}

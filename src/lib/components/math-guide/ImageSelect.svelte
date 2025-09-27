@@ -3,7 +3,7 @@
 	import { messages } from '$lib/stores/message-center.svelte'
 	import type { ImageTextData } from '$lib/types/(view)/common/image'
 	import type { MathImageContent } from '$lib/types/(view)/math-guide/image'
-	import { imageTextDataToDataUrl } from '$lib/utils/(view)/image'
+	import { imageTextDataToDataUrl } from '$lib/utils/(view)/common/image'
 
 	const {
 		fileOnchange,
