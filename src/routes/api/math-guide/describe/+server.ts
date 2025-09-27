@@ -2,9 +2,10 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { type Part } from '@google-cloud/vertexai';
-import { generateWithImage } from '$lib/api/math-guide';
 import { validateTurnstile } from '$lib/api/common/turnstile';
-import { imageFileToBase64 } from '$lib/utils/encode-decode';
+import { generate } from '$lib/api/math-guide';
+import { AI_QUERY_API_INPUT_TEXT_MAXLENGTH, MATH_PROMPT_START } from '$lib/constants/api/math-guide';
+import { DEFAULT_IMAGE_MIME } from '$lib/api/common/image';
 
 // export const POST: RequestHandler = async ({ params, platform, request }) => {
 export const POST: RequestHandler = async ({ request, platform }) => {
@@ -13,22 +14,59 @@ export const POST: RequestHandler = async ({ request, platform }) => {
     }
 
     const formData = await request.formData()
-    const image = formData.get("image")
+    const question = formData.get("question")?.toString().trim()
+    const wholeText = formData.get("wholeText")?.toString().trim()
+    const imageBase64 = formData.get("imageBase64")?.toString()
+    const imageMime = formData.get("imageMime")?.toString()
 
-    if (!image || !(image instanceof File)) {
-        return json({ error: '画像ファイルが見つからないか、形式が不正です。' }, { status: 400 });
+    if (!question) {
+        throw json({ error: '問題文がありません。' }, { status: 403 })
     }
 
-    const prompt: Part[] = [
-        { text: '次の 2 つを行ってください。' },
-        { text: '【依頼タスク 1】 問題文の題意を説明してください。どのような問題条件あるいは前提で、問われているものが何かを解説してください。数学用語は初歩的なものを含めて適宜解説してください。回答のタイトルは「題意 (だいい)」としてください。' },
-        { text: '【依頼タスク 2】 問題文の解き方を説明してください。着目するべきポイントがどこであり、どのように解き進めていくべきなのかという方向性を示してください。論理展開は、初学者がわかるように、易しいものにしてください。回答のタイトルは「解き方 (ときかた)」としてください。' },
-        { text: '【タスク条件: 内容】最後の答えは書かず、相手に解く余地を残す。原文内容に忠実に沿うことを重視して、わかりやすく丁寧に説明する。' },
-        { text: '【タスク条件: 解答書式】Markdown 形式の文字列で回答する。 数式および変数は KaTeX 記法で記述する。数式は $$ 囲みでディスプレイ表記にする。LaTeX 記法および MathML 記法は使わない。' },
-        { text: '【回答条件】回答は日本語で生成する。回答内容は生成文章のみに限定して、あなた自身のメッセージは含めない。' },
+    if (AI_QUERY_API_INPUT_TEXT_MAXLENGTH < question!.length) {
+        throw json({ error: '問題文が長すぎます。' }, { status: 403 })
+    }
+
+    let prompt: Part[] = [
+        { text: MATH_PROMPT_START },
+        { text: '【タスク】 問題文の題意を説明してください。問題条件あるいは前提が何で、問われているものが何なのかを、解説してください。数学用語は、初歩的なものを含めて、適宜解説してください。' },
+        { text: `【問題文】${question}` },
+        { text: '【回答書式】Markdown 形式の文字列。テキスト言語は日本語。 数式および変数は KaTeX 記法で記述する。数式は $$ 囲みでディスプレイ表記にする。LaTeX 記法および MathML 記法は使わない。' },
+        { text: '【回答条件: 内容】最後の答えは書かず、相手に解く余地を残す。' },
+        { text: '【回答口調】原文内容に忠実に沿うことを重視して、わかりやすく丁寧に説明する。' },
+        // { text: '【回答口調】熱血漢でひっぱっていく口調' },
+        // { text: '【回答口調】勉強につまずいて傷ついている子供のそばに寄り添う優しい口調' },
     ]
 
-    const candidate = await generateWithImage(platform?.env as Env, prompt, await imageFileToBase64(image))
+    if (wholeText || imageBase64) {
+        const addition: Part[] = [
+            { text: '次の内容は補足情報です。回答時の参考にしてください。これらに関する情報を回答に含めることは不要です。' },
+        ]
+        if (wholeText) {
+            addition.push(
+                { text: '* 今回の問題は全体の一部である。問題文全体は以下の通り:' },
+                { text: `${wholeText}` },
+            )
+        }
+        if (imageBase64) {
+            addition.push(
+                { text: '* 今回の問題にはダイアグラムが含まれている。問題文全体の画像は以下の通り。この中のダイアグラム部分を参考にする:' },
+                {
+                    inlineData: {
+                        mimeType: imageMime ?? DEFAULT_IMAGE_MIME,
+                        data: imageBase64,
+                    },
+                },
+            )
+        }
+
+        prompt = [
+            ...prompt,
+            ...addition
+        ]
+    }
+
+    const candidate = await generate(platform?.env as Env, prompt)
 
     const generatedText = candidate.content.parts.map((part) => part.text).join("")
 

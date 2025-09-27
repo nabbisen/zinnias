@@ -3,6 +3,7 @@ import type { RequestHandler } from './$types';
 import { type Part } from '@google-cloud/vertexai';
 import { validateTurnstile } from '$lib/api/common/turnstile';
 import { generate } from '$lib/api/math-guide';
+import { AI_QUERY_API_INPUT_TEXT_MAXLENGTH } from '$lib/constants/api/math-guide';
 
 // export const POST: RequestHandler = async ({ params, platform, request }) => {
 export const POST: RequestHandler = async ({ request, platform }) => {
@@ -14,7 +15,10 @@ export const POST: RequestHandler = async ({ request, platform }) => {
     const text = formData.get('text')?.toString().trim()
 
     if (!text) {
-        return json({ error: 'テキストが不正です。' }, { status: 400 });
+        return json({ error: 'テキストがありません。' }, { status: 400 });
+    }
+    if (AI_QUERY_API_INPUT_TEXT_MAXLENGTH < text!.length) {
+        throw json({ error: 'テキストが長すぎます。' }, { status: 403 })
     }
 
     const prompt: Part[] = [

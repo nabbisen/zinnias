@@ -12,16 +12,6 @@
 	import ImageText from '$lib/components/math-guide/ImageText.svelte'
 	import type { ImageTextData } from '$lib/types/(view)/common/image'
 
-	// let imgSrc = $state('')
-	// let showImgSrc = $state(false)
-
-	// let describeGeneratedText = $state('')
-	// let describeHTML = $state('')
-	// let describeTranslateHTML = $state('')
-	// let solveGeneratedText = $state('')
-	// let solveHTML = $state('')
-	// let solveTranslateHTML = $state('')
-
 	let showsUsage = $state(false)
 
 	let imageTextData: ImageTextData | null = $state(null)
@@ -38,125 +28,6 @@
 		imageContent = c
 		imageTextData = i
 	}
-
-	// function handleMathGuide(processor: string) {
-	// 	if (!file) {
-	// 		messages.pushWarn('イメージがえらばれていません')
-	// 		return
-	// 	}
-
-	// 	const successCallback = (file: File) => {
-	// 		compressImageSuccessCallback(file, processor)
-	// 	}
-
-	// 	compressImage(file, successCallback, compressImageErrorCallback)
-	// }
-
-	// async function compressImageSuccessCallback(file: File, processor: string) {
-	// 	const compressedReader = new FileReader()
-	// 	compressedReader.onload = (e) => {
-	// 		const compressedImageUrl = e.target?.result as string
-	// 		imgSrc = compressedImageUrl
-	// 	}
-	// 	compressedReader.readAsDataURL(file)
-
-	// 	let ret: string
-	// 	try {
-	// 		ret = (await generateMathGuide(file, processor)) as string
-	// 	} catch (error: unknown) {
-	//      messages.pushError(error)
-	// 		return
-	// 	}
-
-	// 	const retHTML = await markdownToMathHTML(ret)
-
-	// 	switch (processor) {
-	// 		case 'describe': {
-	// 			describeGeneratedText = ret
-	// 			describeHTML = retHTML
-	// 			break
-	// 		}
-	// 		case 'solve': {
-	// 			solveGeneratedText = ret
-	// 			solveHTML = retHTML
-	// 			break
-	// 		}
-	// 	}
-	// }
-
-	// function compressImageErrorCallback(error: Error) {
-	// 	messages.pushError('画像の圧縮中にエラーが発生しました:', error.message)
-	// }
-
-	// function handleDescribeMathGuide() {
-	// 	handleMathGuide('describe')
-	// }
-
-	// function handleSolveMathGuide() {
-	// 	handleMathGuide('solve')
-	// }
-
-	// async function handleTranslate(
-	// 	e: MouseEvent & {
-	// 		currentTarget: EventTarget & HTMLButtonElement
-	// 	}
-	// ) {
-	// 	const processor = e.currentTarget.dataset.processor!
-	// 	const targetLanguage = e.currentTarget.dataset.targetLanguage!
-
-	// 	switch (processor) {
-	// 		case 'describe': {
-	// 			describeTranslateHTML = await markdownToMathHTML(
-	// 				await translate(describeGeneratedText, targetLanguage)
-	// 			)
-	// 			break
-	// 		}
-	// 		case 'solve': {
-	// 			solveTranslateHTML = await markdownToMathHTML(
-	// 				await translate(solveGeneratedText, targetLanguage)
-	// 			)
-	// 			break
-	// 		}
-	// 		default: {
-	// 			messages.pushError('よきせぬエラーです')
-	// 			break
-	// 		}
-	// 	}
-	// }
-
-	// async function handleTextToClipboard(
-	// 	e: MouseEvent & {
-	// 		currentTarget: EventTarget & HTMLButtonElement
-	// 	}
-	// ) {
-	// 	const processor = e.currentTarget.dataset.processor!
-
-	// 	let text = ''
-	// 	switch (processor) {
-	// 		case 'describe': {
-	// 			text = describeGeneratedText
-	// 			break
-	// 		}
-	// 		case 'solve': {
-	// 			text = solveGeneratedText
-	// 			break
-	// 		}
-	// 		default: {
-	// 			messages.pushError('よきせぬエラーです')
-	// 			break
-	// 		}
-	// 	}
-	// 	if (!text) {
-	// 		messages.pushError('はりつけるテキストがありません')
-	// 		return
-	// 	}
-
-	// 	if (await copyToClipboard(text)) {
-	// 		messages.pushInfo('クリップボードにコピーしました')
-	// 	} else {
-	// 		messages.pushError('クリップボードへのコピーがしっぱいしました')
-	// 	}
-	// }
 </script>
 
 <h2>すうがくをかいせつ</h2>
@@ -183,10 +54,9 @@
 	{#if 0 < imageContent.questions.length}
 		<ImageText
 			question={{
-				question: null,
-				hasDiagram: imageContent.hasDiagram,
-				image: imageTextData!,
 				imageWholeText: imageText(),
+				image: imageTextData!,
+				hasDiagram: imageContent.hasDiagram,
 			}}
 		/>
 		{#each imageContent.questions as question}
@@ -206,41 +76,15 @@
 				question: imageText(),
 				hasDiagram: imageContent.hasDiagram,
 				image: imageTextData!,
-				imageWholeText: imageText(),
+				imageWholeText: null,
 			}}
 		/>
 	{/if}
 {/if}
 
 <!--
-{#if file}
-	<Clauses {file} />
-{/if}
-
 <button onclick={handleDescribeMathGuide}>題意 (だいい) と ときかた</button>
-{#if describeGeneratedText}
-	<div class="markdown-container">
-		{@html describeHTML}
-	</div>
-	<div>
-		<button data-processor="describe" onclick={handleTextToClipboard}>クリップボードにコピー</button
-		>
-	</div>
-	<div>
-		<button data-processor="describe" data-target-language="en" onclick={handleTranslate}>
-			English
-		</button>
-		<button data-processor="describe" data-target-language="zh-CN" onclick={handleTranslate}>
-			中国語（簡体）
-		</button>
-	</div>
-	{#if describeTranslateHTML}
-		<div class="markdown-container">
-			{@html describeTranslateHTML}
-		</div>
-	{/if}
-	<hr />
-{/if}
+
 
 <button onclick={handleSolveMathGuide}>解答 (かいとう)</button>
 {#if solveGeneratedText}

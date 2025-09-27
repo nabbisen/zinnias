@@ -1,15 +1,17 @@
 <script lang="ts">
-	import type { MathGuideQuestion } from '$lib/types/(view)/math-guide/question'
+	import type { MathGuideImageText } from '$lib/types/(view)/math-guide/question'
 
-	const { question }: { question: MathGuideQuestion } = $props()
+	const { question }: { question: MathGuideImageText } = $props()
 
 	function handleClausesParse() {}
 	function handleDescribe() {}
+	function handleExplain() {}
 </script>
 
-<div>{question.imageText}</div>
+<div>{question.imageWholeText}</div>
 
 <div>
 	<button onclick={handleClausesParse}>にほんご</button>
-	<button onclick={handleDescribe}>ときかた</button>
+	<button onclick={handleDescribe}>だいい</button>
+	<button onclick={handleExplain}>ときかた</button>
 </div>

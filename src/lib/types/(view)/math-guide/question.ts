@@ -1,8 +1,14 @@
 import type { ImageTextData } from "../common/image";
 
 export interface MathGuideQuestion {
-    question: string | null,
+    question: string,
     hasDiagram: boolean,
     image: ImageTextData,
-    imageWholeText: string,
+    imageWholeText: string | null,
+}
+
+export interface MathGuideImageText {
+    imageWholeText: string
+    image: ImageTextData,
+    hasDiagram: boolean,
 }
