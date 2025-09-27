@@ -1,6 +1,4 @@
 import { loading } from "$lib/stores/loading-effect.svelte"
-import type { ClauseItem } from "$lib/types/(view)/math-guide/clause-parse"
-import { postFormData } from "../common/api"
 
 export async function generateMathGuide(file: File, processor: string): Promise<string> {
     loading.start()
@@ -33,12 +31,3 @@ export async function generateMathGuide(file: File, processor: string): Promise<
     return responseJson.generatedText as string
 }
 
-
-
-export async function clauseParse(file: File): Promise<ClauseItem[]> {
-    const formData = new FormData()
-    formData.append('image', file, file.name)
-
-    const responseJson = await postFormData('/api/math-guide/read/clause-parse', formData)
-    return responseJson.result
-}

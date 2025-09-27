@@ -1,7 +1,5 @@
-import { json } from '@sveltejs/kit';
-import type { RequestHandler } from '../image-analyze/$types';
 import { type GenerateContentCandidate, type Part } from '@google-cloud/vertexai';
-import { imageProcess } from '$lib/api/math-guide';
+import { generateWithImage } from '$lib/api/math-guide';
 
 // export const POST: RequestHandler = async ({ params, platform, request }) => {
 export async function mathGuideImageValidate(platformEnv: Env | undefined, imageBase64: string): Promise<boolean> {
@@ -12,7 +10,7 @@ export async function mathGuideImageValidate(platformEnv: Env | undefined, image
 
     let candidate: GenerateContentCandidate
     try {
-        candidate = await imageProcess(platformEnv, prompt, imageBase64)
+        candidate = await generateWithImage(platformEnv, prompt, imageBase64)
     } catch (error: any) {
         throw error
     }

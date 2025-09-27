@@ -2,7 +2,7 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { type Part } from '@google-cloud/vertexai';
-import { imageProcess } from '$lib/api/math-guide';
+import { generateWithImage } from '$lib/api/math-guide';
 import { validateTurnstile } from '$lib/api/common/turnstile';
 import { imageFileToBase64 } from '$lib/utils/encode-decode';
 
@@ -28,7 +28,7 @@ export const POST: RequestHandler = async ({ request, platform }) => {
         { text: '【回答条件】回答は日本語で生成する。回答内容は生成文章のみに限定して、あなた自身のメッセージは含めない。' },
     ]
 
-    const candidate = await imageProcess(platform?.env as Env, prompt, await imageFileToBase64(image))
+    const candidate = await generateWithImage(platform?.env as Env, prompt, await imageFileToBase64(image))
 
     const generatedText = candidate.content.parts.map((part) => part.text).join("")
 

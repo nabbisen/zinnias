@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { messages } from '$lib/stores/message-center.svelte'
-	import { compressImage, copyToClipboard } from '$lib/utils'
 	import { generateImageDescription } from './utils'
 
 	let imgSrc = $state('')
@@ -29,8 +28,8 @@
 
 		try {
 			imageDescriptionText = await generateImageDescription(file)
-		} catch (error) {
-			messages.pushError(error as string)
+		} catch (error: unknown) {
+			messages.pushError(error)
 		}
 	}
 

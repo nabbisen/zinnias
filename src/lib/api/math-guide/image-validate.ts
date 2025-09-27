@@ -1,5 +1,5 @@
 import type { GenerateContentCandidate, Part } from "@google-cloud/vertexai"
-import { imageProcess } from "."
+import { generateWithImage } from "."
 
 export async function mathGuideImageValidate(platformEnv: Env | undefined, imageBase64: string): Promise<boolean> {
     const prompt: Part[] = [
@@ -9,7 +9,7 @@ export async function mathGuideImageValidate(platformEnv: Env | undefined, image
 
     let candidate: GenerateContentCandidate
     try {
-        candidate = await imageProcess(platformEnv, prompt, imageBase64)
+        candidate = await generateWithImage(platformEnv, prompt, imageBase64)
     } catch (error: any) {
         throw error
     }
