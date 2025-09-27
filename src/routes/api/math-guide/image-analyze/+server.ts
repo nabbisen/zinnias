@@ -2,13 +2,13 @@ import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { type GenerateContentCandidate } from '@google-cloud/vertexai';
 import { validateTurnstile } from '$lib/api/common/turnstile';
-import sharp from 'sharp';
 import { mathGuideTextFromImage } from '../../text-from-image/utils';
 import { imageAnalyze } from '$lib/api/math-guide/image-analyze';
 import { DEFAULT_IMAGE_MIME, imageOptimize } from '$lib/api/common/image';
 import { VERTEX_IMAGE_UNIT } from '$lib/api/common/google-cloud';
 import type { ImageTextData } from '$lib/types/(view)/common/image';
 import { mathGuideImageValidate } from '$lib/api/math-guide/image-validate';
+import { Jimp } from 'jimp';
 
 // export const POST: RequestHandler = async ({ params, platform, request }) => {
 export const POST: RequestHandler = async ({ request, platform }) => {
@@ -25,10 +25,9 @@ export const POST: RequestHandler = async ({ request, platform }) => {
 
     const imageBuffer = await imageOptimize(image)
 
-    const compressedImageBase64 = (await sharp(imageBuffer)
-        .resize(VERTEX_IMAGE_UNIT, VERTEX_IMAGE_UNIT, { fit: 'inside' })
-        .webp({ quality: 80 })
-        .toBuffer()).toString("base64")
+    const compressedImageBase64 = (await (await Jimp.read(imageBuffer))
+        .scaleToFit({ w: VERTEX_IMAGE_UNIT, h: VERTEX_IMAGE_UNIT })
+        .getBuffer(DEFAULT_IMAGE_MIME)).toString("base64")
 
     let validated = false
 
