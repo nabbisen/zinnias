@@ -8,7 +8,7 @@
 		renderAsHTML,
 	}: {
 		text: string
-		processTranslatedText: ((translatedText: string) => string | Promise<string>) | null
+		processTranslatedText?: (translatedText: string) => string | Promise<string>
 		renderAsHTML: boolean
 	} = $props()
 

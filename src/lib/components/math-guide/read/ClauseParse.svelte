@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { clauseParse } from '$lib/(view)/math-guide/read/clause'
 	import CopyToClipboard from '$lib/components/common/CopyToClipboard.svelte'
+	import Translate from '$lib/components/translate/Translate.svelte'
 	import { messages } from '$lib/stores/message-center.svelte'
 	import type { ClauseItem } from '$lib/types/(view)/math-guide/clause-parse'
 
@@ -44,5 +45,6 @@
 		<div>
 			<CopyToClipboard {text} />
 		</div>
+		<Translate {text} renderAsHTML={false} />
 	{/if}
 {/if}

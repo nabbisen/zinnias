@@ -7,7 +7,8 @@ export interface MathGuideQuestionStep {
     imageWholeText: string | null,
 }
 
-export interface MathGuideImageText {
+export interface MathGuideQuestionInstruction {
+    instruction: string,
     imageWholeText: string
     image: ImageTextData,
     hasDiagram: boolean,
