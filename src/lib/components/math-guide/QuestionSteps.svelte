@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { MathGuideQuestionStep } from '$lib/types/(view)/math-guide/math-step'
-	import Describe from './question/Describe.svelte'
+	import Describe from './question-step/Describe.svelte'
 	import ClauseParse from './read/ClauseParse.svelte'
 
 	const { questionStep }: { questionStep: MathGuideQuestionStep } = $props()

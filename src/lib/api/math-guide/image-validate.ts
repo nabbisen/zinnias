@@ -1,6 +1,7 @@
-import type { GenerateContentCandidate, Part } from "@google-cloud/vertexai"
-import { generateWithImage } from "."
+import { type GenerateContentCandidate, type Part } from '@google-cloud/vertexai';
+import { generateWithImage } from '$lib/api/math-guide';
 
+// export const POST: RequestHandler = async ({ params, platform, request }) => {
 export async function mathGuideImageValidate(platformEnv: Env | undefined, imageBase64: string): Promise<boolean> {
     const prompt: Part[] = [
         { text: '画像が学習教材の数学の問題かどうかを分析して、それが true である場合、回答を 1 とする。それ以外の場合、回答を 0 とする。' },
