@@ -1,13 +1,10 @@
 <script lang="ts">
-	import { clauseParse } from '$lib/(view)/math-guide/read/clause'
-	import { messages } from '$lib/stores/message-center.svelte'
-	import type { ClauseItem } from '$lib/types/(view)/math-guide/clause-parse'
 	import type { MathGuideQuestion } from '$lib/types/(view)/math-guide/question'
-	import Clause from './question/Clause.svelte'
+	import ClauseParse from './question/read/ClauseParse.svelte'
 
 	const { question }: { question: MathGuideQuestion } = $props()
 
-	let clauseText: string | null = $state(null)
+	let clauseText: string = $state('')
 
 	async function handleClauseParse() {
 		clauseText = question.imageWholeText
@@ -26,10 +23,9 @@
 
 <div>
 	<button onclick={handleClauseParse}>にほんご</button>
+	<button onclick={() => (clauseText = '')}>Clear</button>
 	<button onclick={handleDescribe}>ときかた</button>
 	<button onclick={handleSolve}>かいとう</button>
 </div>
 
-{#if clauseText}
-	<Clause text={clauseText} />
-{/if}
+<ClauseParse text={clauseText} />

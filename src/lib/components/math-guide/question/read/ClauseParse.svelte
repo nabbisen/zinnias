@@ -4,14 +4,15 @@
 	import { messages } from '$lib/stores/message-center.svelte'
 	import type { ClauseItem } from '$lib/types/(view)/math-guide/clause-parse'
 
-	const { text }: { text: string | null } = $props()
+	const { text }: { text: string } = $props()
 
 	let clauses: ClauseItem[] = $state([])
 
 	const hasTranslation = $derived(clauses.some((x) => x.translate))
 
 	$effect(() => {
-		if (!text) return
+		if (!text.trim()) return
+
 		clauseParse(text)
 			.then((result) => {
 				clauses = result
