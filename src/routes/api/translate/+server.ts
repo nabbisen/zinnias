@@ -1,21 +1,26 @@
-import { json, text } from '@sveltejs/kit';
+import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-import { validateTurnstile } from '$lib/utils/turnstile';
+import { validateTurnstile } from '$lib/api/common/turnstile';
 import { Translate } from '@google-cloud/translate/build/src/v2';
+import { AI_QUERY_API_INPUT_TEXT_MAXLENGTH } from '$lib/constants/api/math-guide';
 
 // export const POST: RequestHandler = async ({ params, platform, request }) => {
 export const POST: RequestHandler = async ({ request, platform }) => {
-    if (!await validateTurnstile(request.headers)) return json({ error: 'リクエストトークンが不正です。' }, { status: 403 });
+    if (!await validateTurnstile(platform?.env.CLOUDFLARE_TURNSTILE_SECRET || "", request.headers)) return json({ error: 'リクエストトークンが不正です。' }, { status: 403 });
 
     const requestJson = await request.json() as Record<string, any>
     const text = requestJson.text
     const targetLanguage = requestJson.targetLanguage
 
     if (!text) {
-        return json({ error: 'テキストが見つかりません。' }, { status: 400 });
+        return json({ error: 'テキストがありません。' }, { status: 400 });
     }
     if (!targetLanguage) {
-        return json({ error: 'ほんやくたいしょうが見つかりません。' }, { status: 400 });
+        return json({ error: 'ほんやくたいしょうげんごのしていがありません。' }, { status: 400 });
+    }
+
+    if (AI_QUERY_API_INPUT_TEXT_MAXLENGTH < text!.length) {
+        throw json({ error: 'テキストが長すぎます。' }, { status: 403 })
     }
 
     if (!platform?.env.GOOGLE_APPLICATION_CREDENTIALS_JSON) {
@@ -36,10 +41,4 @@ export const POST: RequestHandler = async ({ request, platform }) => {
         console.error('Translation error:', error);
         return json({ error: 'ほんやくにしっぱい' }, { status: 500 });
     }
-};
-
-// todo: necessay ? can be removed ?
-// This handler will respond to PUT, PATCH, DELETE, etc.
-export const fallback: RequestHandler = async ({ request }) => {
-    return text(`I caught your ${request.method} request!`)
-};
+}

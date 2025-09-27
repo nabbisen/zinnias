@@ -1,13 +1,13 @@
 import { json, text } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-import { validateTurnstile } from '$lib/utils/turnstile';
+import { validateTurnstile } from '$lib/api/common/turnstile';
 import { VertexAI } from '@google-cloud/vertexai';
 
 const DEFAULT_PROFICIENCY_LEVEL: number = 3
 
 // export const POST: RequestHandler = async ({ params, platform, request }) => {
 export const POST: RequestHandler = async ({ request, platform }) => {
-    if (!await validateTurnstile(request.headers)) return json({ error: 'リクエストトークンが不正です。' }, { status: 403 });
+    if (!await validateTurnstile(platform?.env.CLOUDFLARE_TURNSTILE_SECRET || "", request.headers)) return json({ error: 'リクエストトークンが不正です。' }, { status: 403 });
 
     const requestJson = await request.json() as Record<string, any>
     const text = requestJson.text

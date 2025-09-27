@@ -1,5 +1,5 @@
 <script>
-	import { NAV_MENUS } from '$lib/constants/nav'
+	import { NAV_MENUS } from '$lib/constants/(view)/common/nav'
 </script>
 
 <div>

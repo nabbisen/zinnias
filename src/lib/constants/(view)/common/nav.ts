@@ -1,5 +1,4 @@
-import type { NavMenu } from "$lib/types/nav";
-
+import type { NavMenu } from "$lib/types/(view)/nav";
 
 export const NAV_MENUS: NavMenu[] = [
     {

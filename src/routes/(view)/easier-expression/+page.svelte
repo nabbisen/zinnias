@@ -16,8 +16,8 @@
 	async function handleEasierExpression() {
 		try {
 			easierExpressionText = await generateEasierExpression(text, proficiencyLevel)
-		} catch (error) {
-			messages.pushError(error as string)
+		} catch (error: unknown) {
+			messages.pushError(error)
 		}
 	}
 </script>

@@ -1,4 +1,4 @@
-import type { Message, MessageLevel } from "$lib/types/message-center"
+import type { Message, MessageLevel } from "$lib/types/(view)/common/message-center"
 
 const state: { messages: Message[] } = $state({
     messages: []
@@ -8,13 +8,13 @@ export const messages = {
     get all(): Message[] {
         return state.messages
     },
-    pushInfo(...content: string[]) {
+    pushInfo(...content: unknown[]) {
         pushMessage(content, "info")
     },
-    pushWarn(...content: string[]) {
+    pushWarn(...content: unknown[]) {
         pushMessage(content, "warn")
     },
-    pushError(...content: string[]) {
+    pushError(...content: unknown[]) {
         pushMessage(content, "error")
     },
     remove(messageId: string) {
@@ -22,9 +22,12 @@ export const messages = {
     }
 }
 
-function pushMessage(content: string[], level: MessageLevel) {
+function pushMessage(content: unknown[], level: MessageLevel) {
     const timestamp = new Date().toLocaleTimeString()
-    const joinedContent = content.map((x) => x.trimEnd()).join(" ")
+    const joinedContent = content.map((x) => {
+        const s = (!(x instanceof String)) ? (x as any).toString() : x
+        return s.trimEnd()
+    }).join(" ")
     const timestampContent = `${joinedContent} (${timestamp})`
     const messageId = randomAsMessageId()
 
