@@ -1,9 +1,10 @@
 <script lang="ts">
+	import '$lib/assets/style/app.scss'
+
 	import { dev } from '$app/environment'
 	import { page } from '$app/state'
 	import favicon from '$lib/assets/favicon.svg'
 	import homeUrlQrcode from '$lib/assets/home-url-qrcode.svg'
-	import '$lib/assets/style.scss'
 	import LoadingEffect from '$lib/components/common/LoadingEffect.svelte'
 	import MessageCenter from '$lib/components/common/MessageCenter.svelte'
 	import { NAV_MENUS } from '$lib/constants/(view)/common/nav'
