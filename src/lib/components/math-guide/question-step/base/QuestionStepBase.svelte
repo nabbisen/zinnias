@@ -36,6 +36,10 @@
 				return []
 			})
 	})
+
+	async function processTranslatedText(translatedText: string) {
+		return await markdownToMathHTML(translatedText)
+	}
 </script>
 
 {#if generatedTextHTML}
@@ -43,6 +47,5 @@
 		{@html generatedTextHTML}
 	</div>
 	<CopyToClipboard text={generatedText} />
-	<Translate />
-	<hr />
+	<Translate text={generatedText} {processTranslatedText} renderAsHTML={true} />
 {/if}
