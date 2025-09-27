@@ -1,5 +1,4 @@
 import { loading } from "$lib/stores/loading-effect.svelte"
-import Compressor from "compressorjs"
 
 export async function textFromImage(file: File): Promise<string> {
     loading.start()
