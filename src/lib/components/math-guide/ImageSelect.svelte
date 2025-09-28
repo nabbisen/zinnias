@@ -25,6 +25,7 @@
 	let imageTextData: ImageTextData | null = $state(null)
 
 	let selectedFile: File | null = $state(null)
+	let showImageText = $state(false)
 
 	const selectedFileDataUrl = $derived(selectedFile && URL.createObjectURL(selectedFile))
 
@@ -74,6 +75,7 @@
 			responseJson = await postFormData('/api/math-guide/image-analyze', formData)
 		} catch (error) {
 			messages.pushError('がぞうしょりちゅうにエラーがはっせいしました')
+			return
 		}
 
 		const validator = responseJson.analyzed as unknown as Record<string, unknown>
@@ -81,6 +83,7 @@
 		if (!validated) {
 			fileUpdate(null, null)
 			messages.pushError('このがぞうは すうがくのもんだいでは ありません')
+			return
 		}
 
 		const c = responseJson.analyzed as unknown as MathImageContent
@@ -120,23 +123,35 @@
 	}
 </script>
 
-<div>
-	<input type="file" bind:this={fileInput} onchange={handleFileChange} />
-</div>
+<article>
+	<header>
+		<input type="file" bind:this={fileInput} onchange={handleFileChange} />
+	</header>
 
-{#if selectedFile}
-	<img src={selectedFileDataUrl} alt="selected optimized" />
-{/if}
-
-{#if imageContent}
-	<div>{imageContent.leading}</div>
-	{#each imageContent.questions as question}
-		<div>{question}</div>
-	{/each}
-	<div>{imageContent.trailing}</div>
-	{#if imageContent.hasDiagram}
-		<div>(図表あり)</div>
+	{#if selectedFile}
+		<img src={selectedFileDataUrl} alt="selected optimized" />
 	{/if}
 
-	<button onclick={() => imageValidateAnalyze(selectedFile!)}>さいかいせき</button>
-{/if}
+	{#if imageContent}
+		<label>
+			画像からちゅうしゅつしたテキストをひょうじ
+			<input type="checkbox" bind:checked={showImageText} />
+		</label>
+		{#if showImageText}
+			<div>{imageContent.leading}</div>
+			{#each imageContent.questions as question}
+				<div>{question}</div>
+			{/each}
+			<div>{imageContent.trailing}</div>
+			{#if imageContent.hasDiagram}
+				<div>(図表あり)</div>
+			{/if}
+		{/if}
+
+		<footer>
+			<button class="outline secondary" onclick={() => imageValidateAnalyze(selectedFile!)}>
+				さいかいせき
+			</button>
+		</footer>
+	{/if}
+</article>

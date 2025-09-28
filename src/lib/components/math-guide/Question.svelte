@@ -38,10 +38,10 @@
 		/>
 	{/each}
 
-	{#if imageContent.leading}
+	{#if imageContent.trailing}
 		<QuestionInstruction
 			questionInstruction={{
-				instruction: imageContent.leading,
+				instruction: imageContent.trailing,
 				imageWholeText,
 				image: imageTextData,
 				hasDiagram: imageContent.hasDiagram,

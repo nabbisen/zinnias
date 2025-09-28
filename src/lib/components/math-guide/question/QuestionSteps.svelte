@@ -29,16 +29,12 @@
 	}
 </script>
 
-{#if questionStep.imageWholeText !== questionStep.question}
-	<div><small>{questionStep.imageWholeText}</small></div>
-{/if}
-
 <h3>問題</h3>
-<div>{questionStep.question}</div>
+<blockquote>{questionStep.question}</blockquote>
 
-<div>
+<div role="group">
 	<button onclick={handleClauseParse}>にほんご</button>
-	<button onclick={() => (clauseText = '')}>Clear</button>
+	<button class="outline secondary" onclick={() => (clauseText = '')}>Clear</button>
 
 	<button onclick={handleDescribe}>だいい</button>
 

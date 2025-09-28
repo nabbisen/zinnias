@@ -1,4 +1,5 @@
 <script lang="ts">
+	import Translate from '$lib/components/translate/Translate.svelte'
 	import type { MathGuideQuestionInstruction } from '$lib/types/(view)/math-guide/question-step'
 	import ClauseParse from '../read/ClauseParse.svelte'
 
@@ -11,10 +12,13 @@
 	}
 </script>
 
-<div>{questionInstruction.instruction}</div>
+<blockquote>{questionInstruction.instruction}</blockquote>
 
 <div>
 	<button onclick={handleClauseParse}>にほんご</button>
 </div>
 
 <ClauseParse text={clauseText} />
+{#if clauseText}
+	<Translate text={clauseText} renderAsHTML={false} />
+{/if}

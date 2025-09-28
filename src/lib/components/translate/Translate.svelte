@@ -38,18 +38,20 @@
 	}
 </script>
 
-<div>
+<div role="group">
 	{#each TRANSLATE_LANGUAGES as language}
-		<button data-target-language={language.code} onclick={handleTranslate}>{language.label}</button>
+		<button class="outline" data-target-language={language.code} onclick={handleTranslate}>
+			{language.label}
+		</button>
 	{/each}
 </div>
 
 {#if translated}
-	<div>
-		{#if renderAsHTML}
-			{@html translated}
-		{:else}
+	{#if renderAsHTML}
+		{@html translated}
+	{:else}
+		<blockquote>
 			{translated}
-		{/if}
-	</div>
+		</blockquote>
+	{/if}
 {/if}

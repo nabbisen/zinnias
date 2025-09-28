@@ -26,4 +26,4 @@
 	}
 </script>
 
-<button onclick={handleCopy}>Copy</button>
+<button class="outline secondary" onclick={handleCopy}>Copy</button>
