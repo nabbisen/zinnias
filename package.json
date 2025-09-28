@@ -19,7 +19,6 @@
 		"@google-cloud/translate": "^9.2.0",
 		"@google-cloud/vertexai": "^1.10.0",
 		"dompurify": "^3.2.7",
-		"jimp": "^1.6.0",
 		"katex": "^0.16.22",
 		"marked": "^16.3.0"
 	},

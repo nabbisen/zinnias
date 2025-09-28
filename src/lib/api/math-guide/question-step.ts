@@ -3,7 +3,7 @@ import { validateTurnstile } from "../common/turnstile"
 import { AI_QUERY_API_INPUT_TEXT_MAXLENGTH, MATH_PROMPT_START } from "$lib/constants/api/math-guide"
 import type { Part } from "@google-cloud/vertexai"
 import type { GenerateTone } from "$lib/types/common/prompt"
-import { DEFAULT_IMAGE_MIME } from "../common/image"
+import { IMAGE_DEFAULT_MIME } from "$lib/constants/common/image"
 import type { MathGuideQuestionStepStage } from "$lib/types/common/math-guide/question-step"
 import { generate } from "."
 import { describePrompt } from "./question-step/describe"
@@ -56,7 +56,7 @@ export async function questionStep(platformEnv: Env | undefined, requestHeaders:
                 { text: '* 今回の問題にはダイアグラムが含まれている。問題文全体の画像は以下の通り。この中のダイアグラム部分を参考にする:' },
                 {
                     inlineData: {
-                        mimeType: imageMime ?? DEFAULT_IMAGE_MIME,
+                        mimeType: imageMime ?? IMAGE_DEFAULT_MIME,
                         data: imageBase64,
                     },
                 },

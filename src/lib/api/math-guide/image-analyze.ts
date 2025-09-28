@@ -1,7 +1,7 @@
 import { DEFAULT_GENERATIVE_MODEL } from "$lib/constants/api/math-guide";
 import { type GenerateContentCandidate, type Part } from "@google-cloud/vertexai";
 import { generativeModel } from ".";
-import { DEFAULT_IMAGE_MIME } from "../common/image";
+import { IMAGE_DEFAULT_MIME } from "$lib/constants/common/image";
 
 export async function imageAnalyze(platformEnv: Env | undefined, text: string, imageBase64: string): Promise<GenerateContentCandidate> {
     if (!platformEnv || !platformEnv.GOOGLE_APPLICATION_CREDENTIALS_JSON) {
@@ -23,7 +23,7 @@ export async function imageAnalyze(platformEnv: Env | undefined, text: string, i
         { text: '【手順 2】以下の画像はテキストの関連画像である。画像中に、問題に関わる 図 / 表 / グラフ が含まれているかどうかを判定する。結果の key を hasDiagram, value type は boolean とする。' },
         {
             inlineData: {
-                mimeType: DEFAULT_IMAGE_MIME,
+                mimeType: IMAGE_DEFAULT_MIME,
                 data: imageBase64,
             },
         },
