@@ -38,7 +38,7 @@ export const POST: RequestHandler = async ({ request, platform }) => {
     });
 
     const proficiencyCondition = 0 <= proficiencyLevel ? `使える語彙と文法を、日本語能力試験 N${proficiencyLevel} レベルまでのものに限定する。` : "使える語彙と文法を日本語能力試験不合格者に合わせて、かつ全体をひらがなとカタカナ中心で構成する。"
-    const prompt = `以下の文章を、非日本語話者が理解しやすい、平易なものにしなさい。条件: ${proficiencyCondition} なるべく短文主義を採用し、かつ、文脈の流れは切らないようには文量のバランス配分をする。主語および目的語があいまいにならないように注意する。回答は生成文章のみに限定する。
+    const prompt = `以下の文章を、非日本語話者が理解しやすい、平易なものにしなさい。条件: ${proficiencyCondition} 短文の連なりで文章を構成する。ただし文脈の流れに気をつけて、文章が自然な流れになるようにする。主語および目的語があいまいにならないように注意する。回答にあなた自身のメッセージは書かない。
 【もとの文章】
 ${text}`;
 

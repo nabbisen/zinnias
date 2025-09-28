@@ -16,7 +16,7 @@ export async function imageAnalyze(platformEnv: Env | undefined, text: string, i
     const prompt: Part[] = [
         { text: '次のテキストを使用して、後述するタスクを行いなさい。' },
         { text: `【テキスト】${text}` },
-        { text: 'タスク内容 = 以下の手順を順番に実行して、結果を JSON にして回答としなさい。' },
+        { text: 'タスク内容 = 以下の手順を順番に実行して、結果を JSON にして回答としなさい。回答にあなた自身のメッセージは書かないこと。' },
         { text: '【手順 1】テキストを leading (文字列) / questions (Array) / trailing (文字列) という構造に分割する。テキストに小問が含まれているかどうかで以下のように分岐する。' },
         { text: '【手順 1-1】小問が含まれている場合: 小問部分を小問単位のテキスト群に分割して、questions 要素群とする。' },
         { text: '【手順 1-2】小問が含まれていない場合: questions は空リストとする。' },
