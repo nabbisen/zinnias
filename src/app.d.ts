@@ -9,6 +9,10 @@ declare global {
         }
     }
 
+    interface Window {
+        onTurnstileSuccess?: (token: string) => void;
+    }
+
     const turnstile: {
         render: (element: string | HTMLElement, options: object) => string;
         reset: (widgetId?: string) => void;
