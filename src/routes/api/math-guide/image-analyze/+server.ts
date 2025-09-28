@@ -4,11 +4,10 @@ import { type GenerateContentCandidate } from '@google-cloud/vertexai';
 import { validateTurnstile } from '$lib/api/common/turnstile';
 import { mathGuideTextFromImage } from '../../text-from-image/utils';
 import { imageAnalyze } from '$lib/api/math-guide/image-analyze';
-import { DEFAULT_IMAGE_MIME, imageOptimize } from '$lib/api/common/image';
-import { VERTEX_IMAGE_UNIT } from '$lib/api/common/google-cloud';
 import type { ImageTextData } from '$lib/types/(view)/common/image';
 import { mathGuideImageValidate } from '$lib/api/math-guide/image-validate';
-import { Jimp } from 'jimp';
+import { imageFileToBase64 } from '$lib/utils/api/common/image';
+import { IMAGE_DEFAULT_MIME } from '$lib/constants/common/image';
 
 // export const POST: RequestHandler = async ({ params, platform, request }) => {
 export const POST: RequestHandler = async ({ request, platform }) => {
@@ -18,21 +17,22 @@ export const POST: RequestHandler = async ({ request, platform }) => {
 
     const formData = await request.formData()
     const image = formData.get("image")
+    const downscaledImage = formData.get("downscaledImage")
 
     if (!image || !(image instanceof File)) {
         return json({ error: '画像ファイルが見つからないか、形式が不正です。' }, { status: 400 })
     }
 
-    const imageBuffer = await imageOptimize(image)
+    if (!downscaledImage || !(downscaledImage instanceof File)) {
+        return json({ error: '縮小画像ファイルが見つからないか、形式が不正です。' }, { status: 400 })
+    }
 
-    const compressedImageBase64 = (await (await Jimp.read(imageBuffer))
-        .scaleToFit({ w: VERTEX_IMAGE_UNIT, h: VERTEX_IMAGE_UNIT })
-        .getBuffer(DEFAULT_IMAGE_MIME)).toString("base64")
+    const downscaledImageBase64 = await imageFileToBase64(downscaledImage)
 
     let validated = false
 
     try {
-        validated = await mathGuideImageValidate(platform?.env as Env | undefined, compressedImageBase64)
+        validated = await mathGuideImageValidate(platform?.env as Env | undefined, downscaledImageBase64)
     } catch (error: any) {
         console.log(error)
         return json({ error: '画像のけんしょうに失敗しました。' }, { status: 500 })
@@ -42,11 +42,11 @@ export const POST: RequestHandler = async ({ request, platform }) => {
         return json({ analyzed: {} })
     }
 
-    const imageBufferBase64 = imageBuffer.toString("base64")
+    const imageBase64 = await await imageFileToBase64(image)
 
     let detectedText = ''
     try {
-        detectedText = await mathGuideTextFromImage(platform?.env as Env | undefined, imageBufferBase64)
+        detectedText = await mathGuideTextFromImage(platform?.env as Env | undefined, imageBase64)
     } catch (error: any) {
         console.log(error)
         return json({ error: 'テキストちゅうしゅつに失敗しました。' }, { status: 500 })
@@ -54,7 +54,7 @@ export const POST: RequestHandler = async ({ request, platform }) => {
 
     let candidate: GenerateContentCandidate
     try {
-        candidate = await imageAnalyze(platform?.env as Env | undefined, detectedText, compressedImageBase64)
+        candidate = await imageAnalyze(platform?.env as Env | undefined, detectedText, downscaledImageBase64)
     } catch (error: any) {
         console.log(error)
         return json({ error: 'API 処理失敗' }, { status: 500 })
@@ -63,7 +63,7 @@ export const POST: RequestHandler = async ({ request, platform }) => {
     const jsonStr = candidate.content.parts.map((part) => part.text).join("").replace(/^```json/, "").replace(/```$/, "")
     const analyzed = JSON.parse(jsonStr)
 
-    const imageTextData: ImageTextData = { base64: imageBufferBase64, mime: DEFAULT_IMAGE_MIME }
+    const imageTextData: ImageTextData = { base64: imageBase64, mime: IMAGE_DEFAULT_MIME }
 
     return json({ analyzed, imageTextData })
 }
