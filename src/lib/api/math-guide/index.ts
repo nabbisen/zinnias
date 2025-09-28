@@ -1,7 +1,7 @@
 import { DEFAULT_GENERATIVE_MODEL, PROMPT_START_WITH_IMAGE } from "$lib/constants/api/math-guide";
+import { IMAGE_DEFAULT_MIME } from "$lib/constants/common/image";
 import { VertexAI, type GenerateContentCandidate, type GenerativeModel, type Part } from "@google-cloud/vertexai";
 import { json } from "@sveltejs/kit";
-import { DEFAULT_IMAGE_MIME } from "../common/image";
 
 export async function generate(platformEnv: Env | undefined, prompt: Part[], model?: string): Promise<GenerateContentCandidate> {
     if (!platformEnv || !platformEnv.GOOGLE_APPLICATION_CREDENTIALS_JSON) {
@@ -87,7 +87,7 @@ async function imageToInputImagePrompt(imageBase64: string): Promise<Part[]> {
         { text: PROMPT_START_WITH_IMAGE },
         {
             inlineData: {
-                mimeType: DEFAULT_IMAGE_MIME,
+                mimeType: IMAGE_DEFAULT_MIME,
                 data: imageBase64,
             },
         },
