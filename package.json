@@ -16,10 +16,9 @@
 		"cf-typegen": "wrangler types ./src/worker-configuration.d.ts"
 	},
 	"dependencies": {
-		"@ameinhardt/unocss-preset-daisy": "^1.1.8",
 		"@google-cloud/translate": "^9.2.0",
 		"@google-cloud/vertexai": "^1.10.0",
-		"daisyui": "^5.1.25",
+		"@picocss/pico": "^2.1.1",
 		"dompurify": "^3.2.7",
 		"katex": "^0.16.22",
 		"marked": "^16.3.0"
@@ -31,7 +30,6 @@
 		"@sveltejs/kit": "^2.43.5",
 		"@sveltejs/vite-plugin-svelte": "^6.2.1",
 		"@types/node": "^24.5.2",
-		"@unocss/preset-wind4": "^66.5.2",
 		"eslint": "^9.36.0",
 		"eslint-config-prettier": "^10.1.8",
 		"eslint-plugin-svelte": "^3.12.4",
@@ -43,7 +41,6 @@
 		"svelte-check": "^4.3.2",
 		"typescript": "^5.9.2",
 		"typescript-eslint": "^8.44.1",
-		"unocss": "^66.5.2",
 		"vite": "^7.1.7",
 		"wrangler": "^4.40.2"
 	}

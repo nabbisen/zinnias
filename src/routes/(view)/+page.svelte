@@ -20,7 +20,7 @@
 	}
 
 	ul {
-		background-color: #ffffffbb;
+		background-color: #ffffffec;
 		padding: 1.2rem 2.4rem;
 	}
 	ul li:not(:first-child):not(:last-child) {

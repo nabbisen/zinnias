@@ -29,4 +29,7 @@
 		background-color: #fffffff2;
 		color: #252525;
 	}
+	div * {
+		color: #252525;
+	}
 </style>

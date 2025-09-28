@@ -1,5 +1,4 @@
 <script lang="ts">
-	import 'virtual:uno.css'
 	import '$lib/assets/style/app.scss'
 
 	import { dev } from '$app/environment'
