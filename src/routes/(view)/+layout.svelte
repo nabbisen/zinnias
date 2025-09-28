@@ -1,4 +1,5 @@
 <script lang="ts">
+	import '$lib/assets/style/ui.css'
 	import '$lib/assets/style/app.scss'
 
 	import { dev } from '$app/environment'

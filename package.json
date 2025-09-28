@@ -18,13 +18,17 @@
 	"dependencies": {
 		"@google-cloud/translate": "^9.2.0",
 		"@google-cloud/vertexai": "^1.10.0",
+		"@tailwindcss/vite": "^4.1.13",
 		"dompurify": "^3.2.7",
 		"katex": "^0.16.22",
-		"marked": "^16.3.0"
+		"marked": "^16.3.0",
+		"tailwindcss": "^4.1.13"
 	},
 	"devDependencies": {
 		"@eslint/compat": "^1.4.0",
 		"@eslint/js": "^9.36.0",
+		"@skeletonlabs/skeleton": "^3.2.2",
+		"@skeletonlabs/skeleton-svelte": "^1.5.2",
 		"@sveltejs/adapter-cloudflare": "^7.2.3",
 		"@sveltejs/kit": "^2.43.5",
 		"@sveltejs/vite-plugin-svelte": "^6.2.1",
