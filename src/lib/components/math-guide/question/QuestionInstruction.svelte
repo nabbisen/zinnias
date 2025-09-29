@@ -19,6 +19,3 @@
 </div>
 
 <ClauseParse text={clauseText} />
-{#if clauseText}
-	<Translate text={clauseText} renderAsHTML={false} />
-{/if}

@@ -35,6 +35,8 @@
 
 <ImageSelect {fileOnchange} />
 
-{#if imageContent && imageTextData}
-	<Question {imageContent} {imageTextData} />
-{/if}
+{#key imageContent}
+	{#if imageContent && imageTextData}
+		<Question {imageContent} {imageTextData} />
+	{/if}
+{/key}

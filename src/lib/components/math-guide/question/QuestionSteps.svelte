@@ -32,15 +32,19 @@
 <h3>問題</h3>
 <blockquote>{questionStep.question}</blockquote>
 
-<div role="group">
-	<button onclick={handleClauseParse}>にほんご</button>
-	<button class="outline secondary" onclick={() => (clauseText = '')}>Clear</button>
-
-	<button onclick={handleDescribe}>だいい</button>
-
-	<button onclick={handleExplain}>ときかた</button>
-
-	<button onclick={handleSolve}>かいとう</button>
+<div class="nav">
+	<div role="group">
+		<button onclick={handleClauseParse}>にほんご</button>
+		<button onclick={handleDescribe}>だいい</button>
+		<button onclick={handleExplain}>ときかた</button>
+		<button onclick={handleSolve}>かいとう</button>
+	</div>
+	<div role="group" class="clear-buttons">
+		<button class="outline secondary" onclick={() => (clauseText = '')}>Clear</button>
+		<button class="outline secondary" onclick={() => (describeQuestionStep = null)}>Clear</button>
+		<button class="outline secondary" onclick={() => (explainQuestionStep = null)}>Clear</button>
+		<button class="outline secondary" onclick={() => (solveQuestionStep = null)}>Clear</button>
+	</div>
 </div>
 
 <ClauseParse text={clauseText} />
@@ -59,3 +63,14 @@
 	<h3>かいとう</h3>
 	<QuestionStepSolve questionStep={solveQuestionStep} />
 {/if}
+
+<style>
+	.nav *[role='group'] {
+		gap: 0.4rem;
+	}
+
+	.clear-buttons button {
+		font-size: 0.8rem;
+		padding: 0.7rem 0;
+	}
+</style>
