@@ -1,12 +1,12 @@
 import { DEFAULT_GENERATIVE_MODEL, PROMPT_START_WITH_IMAGE } from "$lib/constants/api/math-guide";
 import { IMAGE_DEFAULT_MIME } from "$lib/constants/common/image";
 import { VertexAI, type GenerateContentCandidate, type GenerativeModel, type Part } from "@google-cloud/vertexai";
-import { json } from "@sveltejs/kit";
+import { fail, json } from "@sveltejs/kit";
 
 export async function generate(platformEnv: Env | undefined, prompt: Part[], model?: string): Promise<GenerateContentCandidate> {
     if (!platformEnv || !platformEnv.GOOGLE_APPLICATION_CREDENTIALS_JSON) {
         console.error('API 認証情報が設定されていません。');
-        throw json({ error: 'サーバー設定エラー' }, { status: 500 });
+        throw fail(500, { message: 'サーバー設定エラー' });
     }
 
     const credentials = JSON.parse(platformEnv.GOOGLE_APPLICATION_CREDENTIALS_JSON);
@@ -26,7 +26,7 @@ export async function generate(platformEnv: Env | undefined, prompt: Part[], mod
 
     if (!result.response.candidates) {
         console.error('生成に失敗しました。');
-        throw json({ error: 'サーバー処理エラー' }, { status: 500 });
+        throw fail(500, { message: 'サーバー処理エラー' });
     }
 
     return result.response.candidates[0]
@@ -35,7 +35,7 @@ export async function generate(platformEnv: Env | undefined, prompt: Part[], mod
 export async function generateWithImage(platformEnv: Env | undefined, prompt: Part[], imageBase64: string, model?: string): Promise<GenerateContentCandidate> {
     if (!platformEnv || !platformEnv.GOOGLE_APPLICATION_CREDENTIALS_JSON) {
         console.error('API 認証情報が設定されていません。');
-        throw json({ error: 'サーバー設定エラー' }, { status: 500 });
+        throw fail(500, { message: 'サーバー設定エラー' });
     }
 
     const credentials = JSON.parse(platformEnv.GOOGLE_APPLICATION_CREDENTIALS_JSON);

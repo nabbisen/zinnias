@@ -1,3 +1,5 @@
+export const REQUEST_FILE_MAX_SIZE = 5242880 // 5 MB
+
 export const AI_QUERY_API_INPUT_TEXT_MAXLENGTH = 1000
 
 export const DEFAULT_GENERATIVE_MODEL = 'gemini-2.5-flash-lite'

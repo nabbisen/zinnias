@@ -31,39 +31,13 @@ export async function questionStep(platformEnv: Env | undefined, requestHeaders:
         throw json({ error: '問題文が長すぎます。' }, { status: 403 })
     }
 
-    const prompt: Part[] = []
+    const prompt: Part[] = premiseFullContext(wholeText, imageBase64, imageMime)
+
     switch (stepStage) {
         case "describe": prompt.push(...describePrompt(question, generateTone)); break;
         case "explain": prompt.push(...explainPrompt(question, generateTone)); break;
         case "solve": prompt.push(...solvePrompt(question, generateTone)); break;
         default: throw json({ error: 'ステージがありません。' }, { status: 403 })
-    }
-
-    if (wholeText || imageBase64) {
-        const addition: Part[] = [
-            { text: '次の内容は補足情報です。回答時の参考にしてください。これらに関する情報を回答に含めることは不要です。' },
-        ]
-
-        if (wholeText) {
-            addition.push(
-                { text: '* 今回の問題は全体の一部である。問題文全体は以下の通り:' },
-                { text: `${wholeText}` },
-            )
-        }
-
-        if (imageBase64) {
-            addition.push(
-                { text: '* 今回の問題にはダイアグラムが含まれている。問題文全体の画像は以下の通り。この中のダイアグラム部分を参考にする:' },
-                {
-                    inlineData: {
-                        mimeType: imageMime ?? IMAGE_DEFAULT_MIME,
-                        data: imageBase64,
-                    },
-                },
-            )
-        }
-
-        prompt.push(...addition)
     }
 
     const candidate = await generate(platformEnv, prompt)
@@ -73,4 +47,40 @@ export async function questionStep(platformEnv: Env | undefined, requestHeaders:
     return json({ generatedText })
 }
 
+function premiseFullContext(wholeText: string | undefined, imageBase64: string | undefined, imageMime: string | undefined): Part[] {
+    const ret: Part[] = [{ text: MATH_PROMPT_START }]
 
+    if (!wholeText && !imageBase64) return ret
+
+    ret.push(
+        { text: '【前提: 全体像の提示】問題文全体は以下の内容である。回答生成時の参考情報にすること。' },
+    )
+
+    if (wholeText) {
+        ret.push(
+            { text: '問題文全体 =' },
+            { text: `${wholeText}` },
+        )
+    }
+
+    if (imageBase64) {
+        ret.push(
+            { text: '問題文全体の画像 =' },
+            {
+                inlineData: {
+                    mimeType: imageMime ?? IMAGE_DEFAULT_MIME,
+                    data: imageBase64,
+                },
+            },
+            { text: '今回の問題にはダイアグラムが含まれており、参考情報として問題の画像を上に示す。ダイアグラムは、この画像中に示されている。' }
+        )
+    }
+
+    ret.push(
+        { text: '【前提: 注意喚起】回答時、今回のタスクで問われていることに集中する。' },
+        { text: '【前提: 注意喚起の補足: 回答に含めないもの】今回のタスク対象以外の内容は、回答には通常含めない。問題文全体の整理もこの「含めない」ものに該当する。例えば今回の対象が小問の 4 がであれば、生成対象は小問の 4 に関するものとする。 ただし今回の問題文と強く関連する箇所は、例外。' },
+        { text: '【前提: 注意喚起の補足: 今回タスク対象が問題文全体の一部としての小問である可能性】問題文全体が小問に分かれており、その構成が先頭から順番に解かれることを意図しているケースがある。今回のタスク対象が小問である場合、このケースに該当するかを事前に判定する。判定結果が「該当する」である場合、今回のタスク対象より前の小問はすべて解かれている前提とする (適宜、必要分は事前に解くが、それらの過程は回答に含めない)。' },
+    )
+
+    return ret
+}

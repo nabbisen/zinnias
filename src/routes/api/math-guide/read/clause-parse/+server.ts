@@ -1,4 +1,4 @@
-import { json } from '@sveltejs/kit';
+import { fail, json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { type Part } from '@google-cloud/vertexai';
 import { validateTurnstile } from '$lib/api/common/turnstile';
@@ -8,17 +8,18 @@ import { AI_QUERY_API_INPUT_TEXT_MAXLENGTH } from '$lib/constants/api/math-guide
 // export const POST: RequestHandler = async ({ params, platform, request }) => {
 export const POST: RequestHandler = async ({ request, platform }) => {
     if (!await validateTurnstile(platform?.env.CLOUDFLARE_TURNSTILE_SECRET || "", request.headers)) {
-        throw json({ error: 'リクエストトークンが不正です。' }, { status: 403 })
+        throw fail(403, { message: 'リクエストトークンが不正です。' })
     }
 
     const formData = await request.formData()
     const text = formData.get('text')?.toString().trim()
 
     if (!text) {
-        return json({ error: 'テキストがありません。' }, { status: 400 });
+        return fail(400, { message: 'テキストがありません。' });
     }
+
     if (AI_QUERY_API_INPUT_TEXT_MAXLENGTH < text!.length) {
-        throw json({ error: 'テキストが長すぎます。' }, { status: 403 })
+        throw fail(403, { message: 'テキストが長すぎます。' })
     }
 
     const prompt: Part[] = [

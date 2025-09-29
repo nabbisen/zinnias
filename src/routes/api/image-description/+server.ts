@@ -1,4 +1,4 @@
-import { json, text } from '@sveltejs/kit';
+import { fail, json, text } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { validateTurnstile } from '$lib/api/common/turnstile';
 import { VertexAI } from '@google-cloud/vertexai';
@@ -11,12 +11,12 @@ export const POST: RequestHandler = async ({ request, platform }) => {
     const image = formData.get("image")
 
     if (!image || !(image instanceof File)) {
-        return json({ error: '画像ファイルが見つからないか、形式が不正です。' }, { status: 400 });
+        return fail(400, { message: '画像ファイルが見つからないか、形式が不正です。' });
     }
 
     if (!platform?.env.GOOGLE_APPLICATION_CREDENTIALS_JSON) {
         console.error('API 認証情報が設定されていません。');
-        return json({ error: 'サーバー設定エラー' }, { status: 500 });
+        return fail(500, { message: 'サーバー設定エラー' });
     }
 
     const credentials = JSON.parse(platform.env.GOOGLE_APPLICATION_CREDENTIALS_JSON);

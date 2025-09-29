@@ -28,12 +28,10 @@
 					})
 					.catch((error: unknown) => {
 						messages.pushError(error)
-						return []
 					})
 			})
 			.catch((error: unknown) => {
 				messages.pushError(error)
-				return []
 			})
 	})
 

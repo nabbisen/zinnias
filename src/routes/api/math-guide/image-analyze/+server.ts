@@ -1,4 +1,4 @@
-import { json } from '@sveltejs/kit';
+import { fail, json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { type GenerateContentCandidate } from '@google-cloud/vertexai';
 import { validateTurnstile } from '$lib/api/common/turnstile';
@@ -8,11 +8,12 @@ import type { ImageTextData } from '$lib/types/(view)/common/image';
 import { mathGuideImageValidate } from '$lib/api/math-guide/image-validate';
 import { imageFileToBase64 } from '$lib/utils/api/common/image';
 import { IMAGE_DEFAULT_MIME } from '$lib/constants/common/image';
+import { REQUEST_FILE_MAX_SIZE } from '$lib/constants/api/math-guide';
 
 // export const POST: RequestHandler = async ({ params, platform, request }) => {
 export const POST: RequestHandler = async ({ request, platform }) => {
     if (!await validateTurnstile(platform?.env.CLOUDFLARE_TURNSTILE_SECRET || "", request.headers)) {
-        throw json({ error: 'リクエストトークンが不正です。' }, { status: 403 })
+        throw fail(403, { message: 'リクエストトークンが不正です。' })
     }
 
     const formData = await request.formData()
@@ -20,11 +21,15 @@ export const POST: RequestHandler = async ({ request, platform }) => {
     const downscaledImage = formData.get("downscaledImage")
 
     if (!image || !(image instanceof File)) {
-        return json({ error: '画像ファイルが見つからないか、形式が不正です。' }, { status: 400 })
+        return fail(400, { message: '画像ファイルが見つからないか、形式が不正です。' })
     }
 
     if (!downscaledImage || !(downscaledImage instanceof File)) {
-        return json({ error: '縮小画像ファイルが見つからないか、形式が不正です。' }, { status: 400 })
+        return fail(400, { message: '縮小画像ファイルが見つからないか、形式が不正です。' })
+    }
+
+    if (REQUEST_FILE_MAX_SIZE < image.size) {
+        return fail(413, { message: `ファイルサイズが ${REQUEST_FILE_MAX_SIZE / 1024 / 1024} MB を超えています。` });
     }
 
     const downscaledImageBase64 = await imageFileToBase64(downscaledImage)
@@ -35,21 +40,21 @@ export const POST: RequestHandler = async ({ request, platform }) => {
         validated = await mathGuideImageValidate(platform?.env as Env | undefined, downscaledImageBase64)
     } catch (error: any) {
         console.log(error)
-        return json({ error: '画像のけんしょうに失敗しました。' }, { status: 500 })
+        return fail(500, { message: '画像のけんしょうに失敗しました。' })
     }
 
     if (!validated) {
         return json({ analyzed: {} })
     }
 
-    const imageBase64 = await await imageFileToBase64(image)
+    const imageBase64 = await imageFileToBase64(image)
 
     let detectedText = ''
     try {
         detectedText = await mathGuideTextFromImage(platform?.env as Env | undefined, imageBase64)
     } catch (error: any) {
         console.log(error)
-        return json({ error: 'テキストちゅうしゅつに失敗しました。' }, { status: 500 })
+        return fail(500, { message: 'テキストちゅうしゅつに失敗しました。' })
     }
 
     let candidate: GenerateContentCandidate
@@ -57,7 +62,7 @@ export const POST: RequestHandler = async ({ request, platform }) => {
         candidate = await imageAnalyze(platform?.env as Env | undefined, detectedText, downscaledImageBase64)
     } catch (error: any) {
         console.log(error)
-        return json({ error: 'API 処理失敗' }, { status: 500 })
+        return fail(500, { message: 'API 処理失敗' })
     }
 
     const jsonStr = candidate.content.parts.map((part) => part.text).join("").replace(/^```json/, "").replace(/```$/, "")

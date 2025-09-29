@@ -28,6 +28,8 @@
 		padding: 2rem;
 		background-color: #fffffff2;
 		color: #252525;
+		overflow: auto;
+		z-index: 19999;
 	}
 	div * {
 		color: #252525;
