@@ -12,4 +12,4 @@ export const MATH_PROMPT_RESPONSE_FORMAT = '【回答書式】Markdown 形式の
 export const DEFAULT_MAX_OUTPUT_TOKENS = 500
 export const DESCRIBE_MAX_OUTPUT_TOKENS = 400
 export const EXPLAIN_MAX_OUTPUT_TOKENS = 600
-export const SOLVE_MAX_OUTPUT_TOKENS = 700
+export const SOLVE_MAX_OUTPUT_TOKENS = 900
