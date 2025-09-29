@@ -1,22 +1,21 @@
 import type { MathGuideQuestionStep } from "$lib/types/(view)/math-guide/question-step"
 import type { MathGuideQuestionStepStage } from "$lib/types/common/math-guide/question-step"
-import { postFormData } from "../common/api"
+import { postJson } from "$lib/(view)/common/api"
 
 export async function generateQuestionStepText(stepStage: MathGuideQuestionStepStage, questionStep: MathGuideQuestionStep): Promise<string> {
-    const formData = new FormData()
-
-    formData.append('question', questionStep.question)
+    const requestJson = {
+        question: questionStep.question,
+        stepStage: stepStage,
+    } as Record<string, any>
     if (questionStep.imageWholeText) {
-        formData.append('wholeText', questionStep.imageWholeText)
+        requestJson.wholeText = questionStep.imageWholeText
     }
     if (questionStep.hasDiagram) {
-        formData.append('imageBase64', questionStep.image.base64)
-        formData.append('imageMime', questionStep.image.mime)
+        requestJson.imageBase64 = questionStep.image.base64
+        requestJson.imageMime = questionStep.image.mime
     }
 
-    formData.append('stepStage', stepStage)
-
-    const responseJson = await postFormData('/api/math-guide/question-step', formData)
+    const responseJson = await postJson('/api/math-guide/question-step', requestJson)
     const generatedText = responseJson.generatedText as unknown as string
     return generatedText
 }

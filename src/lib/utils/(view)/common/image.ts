@@ -1,5 +1,26 @@
 import { IMAGE_DEFAULT_MIME, IMAGE_QUALITY_FACTOR } from "$lib/constants/common/image";
 
+export async function fileToBase64(file: File): Promise<string> {
+    const dataUrl = await fileToDataUrl(file)
+    return dataUrl.split(",")[1]
+}
+
+async function fileToDataUrl(file: File): Promise<string> {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+
+        reader.onload = () => {
+            resolve(reader.result as string)
+        }
+
+        reader.onerror = (error) => {
+            reject(error)
+        }
+
+        reader.readAsDataURL(file)
+    })
+}
+
 export async function imageOptimize(
     image: File,
     resizeToWidth: number,

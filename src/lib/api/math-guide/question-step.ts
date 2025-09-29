@@ -10,18 +10,18 @@ import { describePrompt } from "./question-step/describe"
 import { explainPrompt } from "./question-step/explain"
 import { solvePrompt } from "./question-step/solve"
 
-export async function questionStep(platformEnv: Env | undefined, requestHeaders: Headers, formData: FormData) {
+export async function questionStep(platformEnv: Env | undefined, requestHeaders: Headers, requestJson: Record<string, unknown>) {
     if (!await validateTurnstile(platformEnv?.CLOUDFLARE_TURNSTILE_SECRET || "", requestHeaders)) {
         throw json({ error: 'リクエストトークンが不正です。' }, { status: 403 })
     }
 
-    const question = formData.get("question")?.toString().trim()
-    const wholeText = formData.get("wholeText")?.toString().trim()
-    const imageBase64 = formData.get("imageBase64")?.toString()
-    const imageMime = formData.get("imageMime")?.toString()
+    const question = requestJson.question?.toString().trim()
+    const wholeText = requestJson.wholeText?.toString().trim()
+    const imageBase64 = requestJson.imageBase64?.toString()
+    const imageMime = requestJson.imageMime?.toString()
 
-    const stepStage = formData.get("stepStage") as MathGuideQuestionStepStage
-    const generateTone = formData.get("generateTone") as GenerateTone
+    const stepStage = requestJson.stepStage as MathGuideQuestionStepStage
+    const generateTone = requestJson.generateTone as GenerateTone
 
     if (!question) {
         throw json({ error: '問題文がありません。' }, { status: 403 })

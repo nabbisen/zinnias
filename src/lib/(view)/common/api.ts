@@ -1,6 +1,6 @@
 import { loading } from "$lib/stores/loading-effect.svelte"
 
-export async function postFormData(path: string, formData: FormData): Promise<Record<string, unknown>> {
+export async function postJson(path: string, requestJson: Record<string, any>): Promise<Record<string, unknown>> {
     loading.start()
 
     const response: Response | void = await fetch(path, {
@@ -8,7 +8,7 @@ export async function postFormData(path: string, formData: FormData): Promise<Re
         headers: {
             "CF-TURNSTILE-RESPONSE": (document.querySelector("input[name=\"cf-turnstile-response\"]") as unknown as HTMLInputElement).value
         },
-        body: formData,
+        body: JSON.stringify(requestJson),
     }).catch((error) => {
         throw new Error('クエリ中にエラーが発生しました:', error)
     }).finally(() => {

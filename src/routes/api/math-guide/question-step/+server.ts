@@ -5,7 +5,7 @@ import { questionStep } from '$lib/api/math-guide/question-step';
 // export const POST: RequestHandler = async ({ params, platform, request }) => {
 export const POST: RequestHandler = async ({ request, platform }) => {
     try {
-        return questionStep(platform?.env as Env | undefined, request.headers, await request.formData())
+        return questionStep(platform?.env as Env | undefined, request.headers, await request.json())
     } catch (error: unknown) {
         console.log(error)
         return error

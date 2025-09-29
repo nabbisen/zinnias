@@ -1,4 +1,4 @@
-export const REQUEST_FILE_MAX_SIZE = 5242880 // 5 MB
+export const REQUEST_IMAGE_BASE64_MAX_SIZE = 4194304 // 3 MB の base64 エンコード結果 (blob の約 4/3 と仮定)
 
 export const AI_QUERY_API_INPUT_TEXT_MAXLENGTH = 1000
 

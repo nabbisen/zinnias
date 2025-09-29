@@ -11,8 +11,8 @@ export const POST: RequestHandler = async ({ request, platform }) => {
         throw fail(403, { message: 'リクエストトークンが不正です。' })
     }
 
-    const formData = await request.formData()
-    const text = formData.get('text')?.toString().trim()
+    const requestJson = await request.json() as unknown as Record<string, unknown>
+    const text = requestJson.text?.toString().trim()
 
     if (!text) {
         return fail(400, { message: 'テキストがありません。' });

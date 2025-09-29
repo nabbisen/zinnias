@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { postFormData } from '$lib/(view)/common/api'
+	import { postJson } from '$lib/(view)/common/api'
 	import {
 		IMAGE_BRIGHTNESS_FACTOR,
 		IMAGE_CONTRAST_FACTOR,
@@ -10,7 +10,7 @@
 	import { messages } from '$lib/stores/message-center.svelte'
 	import type { ImageTextData } from '$lib/types/(view)/common/image'
 	import type { MathImageContent } from '$lib/types/(view)/math-guide/image'
-	import { imageOptimize } from '$lib/utils/(view)/common/image'
+	import { fileToBase64, imageOptimize } from '$lib/utils/(view)/common/image'
 
 	const {
 		fileOnchange,
@@ -63,18 +63,18 @@
 	}
 
 	async function imageValidateAnalyze(file: File) {
-		// todo: always optimized...
 		const images = await formDataImagesFromFile(file)
 
-		const formData = new FormData()
-		formData.append('image', images.image, images.image.name)
-		formData.append('downscaledImage', images.downscaledImage, images.downscaledImage.name)
+		const requestJson = {
+			imageBase64: await fileToBase64(images.image),
+			downscaledImageBase64: await fileToBase64(images.downscaledImage),
+		}
 
 		let responseJson: any
 		try {
-			responseJson = await postFormData('/api/math-guide/image-analyze', formData)
+			responseJson = await postJson('/api/math-guide/image-analyze', requestJson)
 		} catch (error) {
-			messages.pushError('がぞうしょりちゅうにエラーがはっせいしました')
+			messages.pushError('画像しょり中にエラーが発生しました')
 			return
 		}
 
