@@ -1,6 +1,6 @@
 import { json } from "@sveltejs/kit"
 import { validateTurnstile } from "../common/turnstile"
-import { AI_QUERY_API_INPUT_TEXT_MAXLENGTH, MATH_PROMPT_START } from "$lib/constants/api/math-guide"
+import { AI_QUERY_API_INPUT_TEXT_MAXLENGTH, DEFAULT_MAX_OUTPUT_TOKENS, DESCRIBE_MAX_OUTPUT_TOKENS, EXPLAIN_MAX_OUTPUT_TOKENS, MATH_PROMPT_START, SOLVE_MAX_OUTPUT_TOKENS } from "$lib/constants/api/math-guide"
 import type { Part } from "@google-cloud/vertexai"
 import type { GenerateTone } from "$lib/types/common/prompt"
 import { IMAGE_DEFAULT_MIME } from "$lib/constants/common/image"
@@ -33,14 +33,27 @@ export async function questionStep(platformEnv: Env | undefined, requestHeaders:
 
     const prompt: Part[] = premiseFullContext(wholeText, imageBase64, imageMime)
 
+    let maxOutputTokens = undefined
     switch (stepStage) {
-        case "describe": prompt.push(...describePrompt(question, generateTone)); break;
-        case "explain": prompt.push(...explainPrompt(question, generateTone)); break;
-        case "solve": prompt.push(...solvePrompt(question, generateTone)); break;
+        case "describe": {
+            prompt.push(...describePrompt(question, generateTone))
+            maxOutputTokens = DESCRIBE_MAX_OUTPUT_TOKENS
+            break
+        }
+        case "explain": {
+            prompt.push(...explainPrompt(question, generateTone))
+            maxOutputTokens = EXPLAIN_MAX_OUTPUT_TOKENS
+            break
+        }
+        case "solve": {
+            prompt.push(...solvePrompt(question, generateTone))
+            maxOutputTokens = SOLVE_MAX_OUTPUT_TOKENS
+            break
+        }
         default: throw json({ error: 'ステージがありません。' }, { status: 403 })
     }
 
-    const candidate = await generate(platformEnv, prompt)
+    const candidate = await generate(platformEnv, prompt, maxOutputTokens)
 
     const generatedText = candidate.content.parts.map((part) => part.text).join("")
 

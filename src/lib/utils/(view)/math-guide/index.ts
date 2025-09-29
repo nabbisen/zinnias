@@ -24,7 +24,9 @@ function katexReplace(matched: string) {
     try {
         rendered = katex.renderToString(latex, {
             displayMode,
-            output: displayMode ? 'mathml' : 'html',
+            // todo: math format
+            // output: displayMode ? 'mathml' : 'html',
+            output: 'mathml',
         })
     } catch {
         return matched
