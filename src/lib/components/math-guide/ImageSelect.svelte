@@ -10,6 +10,7 @@
 	import { messages } from '$lib/stores/message-center.svelte'
 	import type { ImageTextData } from '$lib/types/(view)/common/image'
 	import type { MathImageContent } from '$lib/types/(view)/math-guide/image'
+	import type { SelectedImage } from '$lib/types/(view)/math-guide/image-select'
 	import { fileToBase64, imageOptimize } from '$lib/utils/(view)/common/image'
 
 	const {
@@ -24,10 +25,12 @@
 	let imageContent: MathImageContent | null = $state(null)
 	let imageTextData: ImageTextData | null = $state(null)
 
-	let selectedFile: File | null = $state(null)
+	let selectedImage: SelectedImage | null = $state(null)
 	let showImageText = $state(false)
 
-	const selectedFileDataUrl = $derived(selectedFile && URL.createObjectURL(selectedFile))
+	const selectedImageDataUrl = $derived(() => {
+		return URL.createObjectURL(selectedImage!.original)
+	})
 
 	let fileInput: HTMLInputElement
 
@@ -40,7 +43,7 @@
 		fileOnchange(c, i)
 	}
 
-	function handleFileChange(
+	async function handleFileChange(
 		e: Event & {
 			currentTarget: EventTarget & HTMLInputElement
 		}
@@ -58,22 +61,22 @@
 
 		const file = files[0]
 
-		// imageOptimize(file)
-		imageValidateAnalyze(file)
+		selectedImage = await formDataImagesFromFile(file)
+
+		imageValidateAnalyze()
 	}
 
-	async function imageValidateAnalyze(file: File) {
-		const images = await formDataImagesFromFile(file)
-
+	async function imageValidateAnalyze() {
 		const requestJson = {
-			imageBase64: await fileToBase64(images.image),
-			downscaledImageBase64: await fileToBase64(images.downscaledImage),
+			imageBase64: selectedImage!.originalBase64,
+			downscaledImageBase64: selectedImage!.downscaledBase64,
 		}
 
 		let responseJson: any
 		try {
 			responseJson = await postJson('/api/math-guide/image-analyze', requestJson)
 		} catch (error) {
+			selectedImage = null
 			messages.pushError('画像しょり中にエラーが発生しました')
 			return
 		}
@@ -81,6 +84,7 @@
 		const validator = responseJson.analyzed as unknown as Record<string, unknown>
 		const validated = 0 < Object.keys(validator).length
 		if (!validated) {
+			selectedImage = null
 			fileUpdate(null, null)
 			messages.pushError('このがぞうは すうがくのもんだいでは ありません')
 			return
@@ -90,14 +94,11 @@
 
 		const i = responseJson.imageTextData as unknown as ImageTextData
 		imageTextData = i
-		selectedFile = images.image
 
 		fileUpdate(c, imageTextData)
 	}
 
-	async function formDataImagesFromFile(
-		file: File
-	): Promise<{ image: File; downscaledImage: File }> {
+	async function formDataImagesFromFile(file: File): Promise<SelectedImage> {
 		const imageBuffer = await imageOptimize(
 			file,
 			IMAGE_MAX_DIMENSION,
@@ -108,6 +109,7 @@
 		)
 		const imageBlob = new Blob([imageBuffer as BlobPart], { type: IMAGE_DEFAULT_MIME })
 		const image = new File([imageBlob], 'image.dat')
+		const imageBase64 = await fileToBase64(image)
 
 		const downscaledImageBuffer = await imageOptimize(
 			image,
@@ -118,8 +120,14 @@
 			type: IMAGE_DEFAULT_MIME,
 		})
 		const downscaledImage = new File([downscaledImageBlob], 'downscaledImage.dat')
+		const downscaledImageBase64 = await fileToBase64(downscaledImage)
 
-		return { image, downscaledImage }
+		return {
+			original: image,
+			originalBase64: imageBase64,
+			downscaled: downscaledImage,
+			downscaledBase64: downscaledImageBase64,
+		} as SelectedImage
 	}
 </script>
 
@@ -128,8 +136,8 @@
 		<input type="file" bind:this={fileInput} onchange={handleFileChange} />
 	</header>
 
-	{#if selectedFile}
-		<img src={selectedFileDataUrl} alt="selected optimized" />
+	{#if selectedImage}
+		<img src={selectedImageDataUrl()} alt="selected optimized" />
 	{/if}
 
 	{#if imageContent}
@@ -149,7 +157,7 @@
 		{/if}
 
 		<footer>
-			<button class="outline secondary" onclick={() => imageValidateAnalyze(selectedFile!)}>
+			<button class="outline secondary" onclick={() => imageValidateAnalyze()}>
 				さいかいせき
 			</button>
 		</footer>
