@@ -31,7 +31,7 @@ export async function questionStep(platformEnv: Env | undefined, requestHeaders:
         throw json({ error: '問題文が長すぎます。' }, { status: 403 })
     }
 
-    const prompt: Part[] = premiseFullContext(wholeText, imageBase64, imageMime)
+    const prompt: Part[] = []
 
     let maxOutputTokens = undefined
     switch (stepStage) {
@@ -53,6 +53,8 @@ export async function questionStep(platformEnv: Env | undefined, requestHeaders:
         default: throw json({ error: 'ステージがありません。' }, { status: 403 })
     }
 
+    prompt.push(...premiseFullContext(wholeText, imageBase64, imageMime))
+
     const candidate = await generate(platformEnv, prompt, maxOutputTokens)
 
     const generatedText = candidate.content.parts.map((part) => part.text).join("")
@@ -66,7 +68,7 @@ function premiseFullContext(wholeText: string | undefined, imageBase64: string |
     if (!wholeText && !imageBase64) return ret
 
     ret.push(
-        { text: '【前提: 全体像の提示】問題文全体は以下の内容である。回答生成時の参考情報にすること。' },
+        { text: '【補足: 全体像の提示】問題文全体は以下の内容である。回答生成時の参考情報にすること。' },
     )
 
     if (wholeText) {
@@ -90,8 +92,8 @@ function premiseFullContext(wholeText: string | undefined, imageBase64: string |
     }
 
     ret.push(
-        { text: '【前提: 回答内容】今回のタスクで問われていることを回答の中心とする。' },
-        { text: '【前提: 回答内容の補足: 例外】問題文を構成する小問群の間の関連性が高く、先頭から順番に解くように誘導されている場合がある。この場合は今回のタスクの前段の問題を事前に解く。 特に図形問題でこの傾向が強い。' },
+        { text: '【補足: 回答内容】今回のタスク内容を回答の対象とする。' },
+        { text: '【補足: 回答内容の補足: 例外】問題文を構成する小問群の間の関連性が高く、先頭から順番に解くように誘導されている場合がある。この場合は今回のタスクより前の小問群の答えを持った状態で始める (それらの答えを得る過程は出力に含めない)。 特に図形問題でこの傾向が強い。' },
     )
 
     return ret
