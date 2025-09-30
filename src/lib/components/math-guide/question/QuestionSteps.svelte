@@ -4,6 +4,7 @@
 	import QuestionStepDescribe from './question-step/QuestionStepDescribe.svelte'
 	import QuestionStepExplain from './question-step/QuestionStepExplain.svelte'
 	import QuestionStepSolve from './question-step/QuestionStepSolve.svelte'
+	import { USER_CONTEXT_MAXLENGTH } from '$lib/constants/common/math-guide'
 
 	const { questionStep }: { questionStep: MathGuideQuestionStep } = $props()
 
@@ -11,6 +12,7 @@
 	let describeQuestionStep: MathGuideQuestionStep | null = $state(null)
 	let explainQuestionStep: MathGuideQuestionStep | null = $state(null)
 	let solveQuestionStep: MathGuideQuestionStep | null = $state(null)
+	let userContext = $state('')
 
 	function handleClauseParse() {
 		clauseText = questionStep.question ?? questionStep.imageWholeText
@@ -45,6 +47,7 @@
 		<button class="outline secondary" onclick={() => (explainQuestionStep = null)}>Clear</button>
 		<button class="outline secondary" onclick={() => (solveQuestionStep = null)}>Clear</button>
 	</div>
+	<textarea bind:value={userContext} maxlength={USER_CONTEXT_MAXLENGTH}></textarea>
 </div>
 
 <ClauseParse text={clauseText} />
@@ -56,12 +59,12 @@
 
 {#if explainQuestionStep}
 	<h3>ときかた</h3>
-	<QuestionStepExplain questionStep={explainQuestionStep} />
+	<QuestionStepExplain questionStep={explainQuestionStep} {userContext} />
 {/if}
 
 {#if solveQuestionStep}
 	<h3>かいとう</h3>
-	<QuestionStepSolve questionStep={solveQuestionStep} />
+	<QuestionStepSolve questionStep={solveQuestionStep} {userContext} />
 {/if}
 
 <style>

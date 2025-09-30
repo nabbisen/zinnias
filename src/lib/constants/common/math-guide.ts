@@ -1,0 +1,1 @@
+export const USER_CONTEXT_MAXLENGTH = 100

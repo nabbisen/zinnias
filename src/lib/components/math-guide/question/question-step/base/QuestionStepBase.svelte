@@ -10,8 +10,12 @@
 	const {
 		stepStage,
 		questionStep,
-	}: { stepStage: MathGuideQuestionStepStage; questionStep: MathGuideQuestionStep | null } =
-		$props()
+		userContext,
+	}: {
+		stepStage: MathGuideQuestionStepStage
+		questionStep: MathGuideQuestionStep | null
+		userContext?: string
+	} = $props()
 
 	let generatedText = $state('')
 	let generatedTextHTML = $state('')
@@ -19,7 +23,7 @@
 	$effect(() => {
 		if (!questionStep?.question.trim()) return
 
-		generateQuestionStepText(stepStage, questionStep)
+		generateQuestionStepText(stepStage, questionStep, userContext)
 			.then((result) => {
 				generatedText = result
 				markdownToMathHTML(generatedText)

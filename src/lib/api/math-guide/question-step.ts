@@ -9,6 +9,7 @@ import { generate } from "."
 import { describePrompt } from "./question-step/describe"
 import { explainPrompt } from "./question-step/explain"
 import { solvePrompt } from "./question-step/solve"
+import { USER_CONTEXT_MAXLENGTH } from "$lib/constants/common/math-guide"
 
 export async function questionStep(platformEnv: Env | undefined, requestHeaders: Headers, requestJson: Record<string, unknown>) {
     if (!await validateTurnstile(platformEnv?.CLOUDFLARE_TURNSTILE_SECRET || "", requestHeaders)) {
@@ -19,6 +20,7 @@ export async function questionStep(platformEnv: Env | undefined, requestHeaders:
     const wholeText = requestJson.wholeText?.toString().trim()
     const imageBase64 = requestJson.imageBase64?.toString()
     const imageMime = requestJson.imageMime?.toString()
+    const userContext = requestJson.userContext?.toString()
 
     const stepStage = requestJson.stepStage as MathGuideQuestionStepStage
     const generateTone = requestJson.generateTone as GenerateTone
@@ -29,6 +31,10 @@ export async function questionStep(platformEnv: Env | undefined, requestHeaders:
 
     if (AI_QUERY_API_INPUT_TEXT_MAXLENGTH < question!.length) {
         throw json({ error: '問題文が長すぎます。' }, { status: 403 })
+    }
+
+    if (userContext && USER_CONTEXT_MAXLENGTH < userContext.length) {
+        throw json({ error: '入力が長すぎます。' }, { status: 403 })
     }
 
     const prompt: Part[] = []
@@ -54,6 +60,10 @@ export async function questionStep(platformEnv: Env | undefined, requestHeaders:
     }
 
     prompt.push(...premiseFullContext(wholeText, imageBase64, imageMime))
+
+    if (userContext) {
+        prompt.push({ text: `【追加情報または補足指示】${userContext}` })
+    }
 
     const candidate = await generate(platformEnv, prompt, maxOutputTokens)
 

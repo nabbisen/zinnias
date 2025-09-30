@@ -2,10 +2,15 @@ import type { MathGuideQuestionStep } from "$lib/types/(view)/math-guide/questio
 import type { MathGuideQuestionStepStage } from "$lib/types/common/math-guide/question-step"
 import { postJson } from "$lib/(view)/common/api"
 
-export async function generateQuestionStepText(stepStage: MathGuideQuestionStepStage, questionStep: MathGuideQuestionStep): Promise<string> {
+export async function generateQuestionStepText(
+    stepStage: MathGuideQuestionStepStage,
+    questionStep: MathGuideQuestionStep,
+    userContext?: string
+): Promise<string> {
     const requestJson = {
         question: questionStep.question,
         stepStage: stepStage,
+        userContext,
     } as Record<string, any>
     if (questionStep.imageWholeText) {
         requestJson.wholeText = questionStep.imageWholeText
