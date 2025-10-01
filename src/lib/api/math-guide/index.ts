@@ -1,9 +1,10 @@
-import { DEFAULT_GENERATIVE_MODEL, DEFAULT_MAX_OUTPUT_TOKENS, PROMPT_START_WITH_IMAGE } from "$lib/constants/api/math-guide";
+import { DEFAULT_GENERATIVE_MODEL, DEFAULT_MAX_OUTPUT_TOKENS } from "$lib/constants/api/math-guide";
+import { PROMPT_START } from "$lib/constants/api/math-guide/image-analyze";
 import { IMAGE_DEFAULT_MIME } from "$lib/constants/common/image";
-import { VertexAI, type GenerateContentCandidate, type GenerativeModel, type Part } from "@google-cloud/vertexai";
+import { VertexAI, type GenerateContentCandidate, type GenerationConfig, type GenerativeModel, type Part } from "@google-cloud/vertexai";
 import { fail, json } from "@sveltejs/kit";
 
-export async function generate(platformEnv: Env | undefined, prompt: Part[], maxOutputTokens?: number, model?: string): Promise<GenerateContentCandidate> {
+export async function generate(platformEnv: Env | undefined, prompt: Part[], generationConfig?: GenerationConfig, maxOutputTokens?: number, model?: string): Promise<GenerateContentCandidate> {
     if (!platformEnv || !platformEnv.GOOGLE_APPLICATION_CREDENTIALS_JSON) {
         console.error('API 認証情報が設定されていません。');
         throw fail(500, { message: 'サーバー設定エラー' });
@@ -12,10 +13,6 @@ export async function generate(platformEnv: Env | undefined, prompt: Part[], max
     const credentials = JSON.parse(platformEnv.GOOGLE_APPLICATION_CREDENTIALS_JSON);
 
     const m = generativeModel(credentials, model)
-
-    const generationConfig = {
-        maxOutputTokens: maxOutputTokens ? maxOutputTokens : DEFAULT_MAX_OUTPUT_TOKENS
-    }
 
     const p = {
         contents: [
@@ -47,6 +44,11 @@ export async function generateWithImage(platformEnv: Env | undefined, prompt: Pa
 
     const m = generativeModel(credentials, model)
 
+    const generationConfig = {
+        temperature: 0.7,
+        candidateCount: 1,
+    }
+
     const inputImagePrompt = await imageToInputImagePrompt(imageBase64)
 
     const p = {
@@ -58,7 +60,8 @@ export async function generateWithImage(platformEnv: Env | undefined, prompt: Pa
                     ...prompt,
                 ]
             }
-        ]
+        ],
+        generationConfig,
     }
 
     const result = await m.generateContent(p);
@@ -89,7 +92,7 @@ export function generativeModel(credentials: Record<string, any>, model?: string
 
 async function imageToInputImagePrompt(imageBase64: string): Promise<Part[]> {
     const inputImagePrompt: Part[] = [
-        { text: PROMPT_START_WITH_IMAGE },
+        { text: PROMPT_START },
         {
             inlineData: {
                 mimeType: IMAGE_DEFAULT_MIME,

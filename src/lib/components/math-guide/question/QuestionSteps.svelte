@@ -9,25 +9,46 @@
 	const { questionStep }: { questionStep: MathGuideQuestionStep } = $props()
 
 	let clauseText: string = $state('')
-	let describeQuestionStep: MathGuideQuestionStep | null = $state(null)
-	let explainQuestionStep: MathGuideQuestionStep | null = $state(null)
-	let solveQuestionStep: MathGuideQuestionStep | null = $state(null)
+	let describeSubmit = $state(false)
+	let describeReset = $state(false)
+	let explainSubmit = $state(false)
+	let explainReset = $state(false)
+	let solveSubmit = $state(false)
+	let solveReset = $state(false)
 	let userContext = $state('')
 
 	function handleClauseParse() {
 		clauseText = questionStep.question ?? questionStep.imageWholeText
 	}
 
-	function handleDescribe() {
-		describeQuestionStep = questionStep
+	function handleDescribeSubmit() {
+		describeSubmit = true
+		setTimeout(() => (describeSubmit = false), 3000)
 	}
 
-	function handleExplain() {
-		explainQuestionStep = questionStep
+	function handleDescribeReset() {
+		describeReset = true
+		setTimeout(() => (describeReset = false), 3000)
 	}
 
-	function handleSolve() {
-		solveQuestionStep = questionStep
+	function handleExplainSubmit() {
+		explainSubmit = true
+		setTimeout(() => (explainSubmit = false), 3000)
+	}
+
+	function handleExplainReset() {
+		explainReset = true
+		setTimeout(() => (explainReset = false), 3000)
+	}
+
+	function handleSolveSubmit() {
+		solveSubmit = true
+		setTimeout(() => (solveSubmit = false), 3000)
+	}
+
+	function handleSolveReset() {
+		solveReset = true
+		setTimeout(() => (solveReset = false), 3000)
 	}
 </script>
 
@@ -37,35 +58,26 @@
 <div class="nav">
 	<div role="group">
 		<button onclick={handleClauseParse}>にほんご</button>
-		<button onclick={handleDescribe}>だいい</button>
-		<button onclick={handleExplain}>ときかた</button>
-		<button onclick={handleSolve}>かいとう</button>
+		<button onclick={handleDescribeSubmit}>だいい</button>
+		<button onclick={handleExplainSubmit}>ときかた</button>
+		<button onclick={handleSolveSubmit}>かいとう</button>
 	</div>
 	<div role="group" class="clear-buttons">
 		<button class="outline secondary" onclick={() => (clauseText = '')}>Clear</button>
-		<button class="outline secondary" onclick={() => (describeQuestionStep = null)}>Clear</button>
-		<button class="outline secondary" onclick={() => (explainQuestionStep = null)}>Clear</button>
-		<button class="outline secondary" onclick={() => (solveQuestionStep = null)}>Clear</button>
+		<button class="outline secondary" onclick={handleDescribeReset}>Clear</button>
+		<button class="outline secondary" onclick={handleExplainReset}>Clear</button>
+		<button class="outline secondary" onclick={handleSolveReset}>Clear</button>
 	</div>
 	<textarea bind:value={userContext} maxlength={USER_CONTEXT_MAXLENGTH}></textarea>
 </div>
 
 <ClauseParse text={clauseText} />
 
-{#if describeQuestionStep}
-	<h3>だいい</h3>
-	<QuestionStepDescribe questionStep={describeQuestionStep} />
-{/if}
+<QuestionStepDescribe submit={describeSubmit} reset={describeReset} {questionStep} />
 
-{#if explainQuestionStep}
-	<h3>ときかた</h3>
-	<QuestionStepExplain questionStep={explainQuestionStep} {userContext} />
-{/if}
+<QuestionStepExplain submit={explainSubmit} reset={explainReset} {questionStep} {userContext} />
 
-{#if solveQuestionStep}
-	<h3>かいとう</h3>
-	<QuestionStepSolve questionStep={solveQuestionStep} {userContext} />
-{/if}
+<QuestionStepSolve submit={solveSubmit} reset={solveReset} {questionStep} {userContext} />
 
 <style>
 	.nav *[role='group'] {

@@ -1,53 +1,57 @@
 <script lang="ts">
-	import { generateQuestionStepText } from '$lib/(view)/math-guide/question-step'
+	import { generateQuestionStep } from '$lib/(view)/math-guide/question-step'
 	import CopyToClipboard from '$lib/components/common/CopyToClipboard.svelte'
 	import Translate from '$lib/components/translate/Translate.svelte'
 	import { messages } from '$lib/stores/message-center.svelte'
 	import type { MathGuideQuestionStep } from '$lib/types/(view)/math-guide/question-step'
 	import type { MathGuideQuestionStepStage } from '$lib/types/common/math-guide/question-step'
 	import { markdownToMathHTML } from '$lib/utils/(view)/math-guide'
+	import type { Snippet } from 'svelte'
 
 	const {
 		stepStage,
+		title,
+		submit,
+		reset,
 		questionStep,
 		userContext,
+		generationRender,
 	}: {
 		stepStage: MathGuideQuestionStepStage
-		questionStep: MathGuideQuestionStep | null
+		title: string
+		submit: boolean
+		reset: boolean
+		questionStep: MathGuideQuestionStep
 		userContext?: string
+		generationRender: Snippet<[{ generation: Record<string, unknown> }]>
 	} = $props()
 
-	let generatedText = $state('')
-	let generatedTextHTML = $state('')
+	let generation: Record<string, unknown> = $state({})
 
 	$effect(() => {
-		if (!questionStep?.question.trim()) return
+		if (submit) handleSubmit()
+	})
 
-		generateQuestionStepText(stepStage, questionStep, userContext)
+	$effect(() => {
+		if (reset) handleReset()
+	})
+
+	function handleSubmit() {
+		generateQuestionStep(stepStage, questionStep, userContext)
 			.then((result) => {
-				generatedText = result
-				markdownToMathHTML(generatedText)
-					.then((result) => {
-						generatedTextHTML = result
-					})
-					.catch((error: unknown) => {
-						messages.pushError(error)
-					})
+				generation = result
 			})
 			.catch((error: unknown) => {
 				messages.pushError(error)
 			})
-	})
+	}
 
-	async function processTranslatedText(translatedText: string) {
-		return await markdownToMathHTML(translatedText)
+	function handleReset() {
+		generation = {}
 	}
 </script>
 
-{#if generatedTextHTML}
-	<div class="markdown-container">
-		{@html generatedTextHTML}
-	</div>
-	<CopyToClipboard text={generatedText} />
-	<Translate text={generatedText} {processTranslatedText} renderAsHTML={true} />
+{#if 0 < Object.keys(generation).length}
+	<h3>{title}</h3>
+	{@render generationRender({ generation })}
 {/if}

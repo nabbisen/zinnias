@@ -2,11 +2,11 @@ import type { MathGuideQuestionStep } from "$lib/types/(view)/math-guide/questio
 import type { MathGuideQuestionStepStage } from "$lib/types/common/math-guide/question-step"
 import { postJson } from "$lib/(view)/common/api"
 
-export async function generateQuestionStepText(
+export async function generateQuestionStep(
     stepStage: MathGuideQuestionStepStage,
     questionStep: MathGuideQuestionStep,
     userContext?: string
-): Promise<string> {
+): Promise<Record<string, unknown>> {
     const requestJson = {
         question: questionStep.question,
         stepStage: stepStage,
@@ -21,6 +21,6 @@ export async function generateQuestionStepText(
     }
 
     const responseJson = await postJson('/api/math-guide/question-step', requestJson)
-    const generatedText = responseJson.generatedText as unknown as string
-    return generatedText
+    const generation = responseJson.generation as unknown as Record<string, unknown>
+    return generation
 }

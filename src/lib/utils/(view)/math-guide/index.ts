@@ -10,6 +10,10 @@ export async function markdownToMathHTML(text: string): Promise<string> {
     return retHTML
 }
 
+export async function processTranslatedText(translatedText: string) {
+    return await markdownToMathHTML(translatedText)
+}
+
 function katexReplace(matched: string) {
     let displayMode = false
     let latex = ''

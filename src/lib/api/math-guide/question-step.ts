@@ -1,7 +1,7 @@
-import { json } from "@sveltejs/kit"
+import { error, json } from "@sveltejs/kit"
 import { validateTurnstile } from "../common/turnstile"
-import { AI_QUERY_API_INPUT_TEXT_MAXLENGTH, DEFAULT_MAX_OUTPUT_TOKENS, DESCRIBE_MAX_OUTPUT_TOKENS, EXPLAIN_MAX_OUTPUT_TOKENS, MATH_PROMPT_START, SOLVE_MAX_OUTPUT_TOKENS } from "$lib/constants/api/math-guide"
-import type { Part } from "@google-cloud/vertexai"
+import { AI_QUERY_API_INPUT_TEXT_MAXLENGTH, DEFAULT_MAX_OUTPUT_TOKENS } from "$lib/constants/api/math-guide"
+import type { GenerationConfig, Part, ResponseSchema } from "@google-cloud/vertexai"
 import type { GenerateTone } from "$lib/types/common/prompt"
 import { IMAGE_DEFAULT_MIME } from "$lib/constants/common/image"
 import type { MathGuideQuestionStepStage } from "$lib/types/common/math-guide/question-step"
@@ -10,10 +10,14 @@ import { describePrompt } from "./question-step/describe"
 import { explainPrompt } from "./question-step/explain"
 import { solvePrompt } from "./question-step/solve"
 import { USER_CONTEXT_MAXLENGTH } from "$lib/constants/common/math-guide"
+import { DESCRIBE_MAX_OUTPUT_TOKENS, DESCRIBE_RESPONSE_SCHEMA } from "$lib/constants/api/math-guide/question-step/describe"
+import { EXPLAIN_MAX_OUTPUT_TOKENS, EXPLAIN_RESPONSE_SCHEMA } from "$lib/constants/api/math-guide/question-step/explain"
+import { SOLVE_MAX_OUTPUT_TOKENS, SOLVE_RESPONSE_SCHEMA } from "$lib/constants/api/math-guide/question-step/solve"
+import { GENERATION_CONFIG_TEMPERATURE, PROMPT_START } from "$lib/constants/api/math-guide/question-step"
 
-export async function questionStep(platformEnv: Env | undefined, requestHeaders: Headers, requestJson: Record<string, unknown>) {
+export async function questionStep(platformEnv: Env | undefined, requestHeaders: Headers, requestJson: Record<string, unknown>): Promise<Response> {
     if (!await validateTurnstile(platformEnv?.CLOUDFLARE_TURNSTILE_SECRET || "", requestHeaders)) {
-        throw json({ error: 'リクエストトークンが不正です。' }, { status: 403 })
+        throw error(403, { message: 'リクエストトークンが不正です。' })
     }
 
     const question = requestJson.question?.toString().trim()
@@ -26,33 +30,37 @@ export async function questionStep(platformEnv: Env | undefined, requestHeaders:
     const generateTone = requestJson.generateTone as GenerateTone
 
     if (!question) {
-        throw json({ error: '問題文がありません。' }, { status: 403 })
+        throw error(403, { message: '問題文がありません。' })
     }
 
     if (AI_QUERY_API_INPUT_TEXT_MAXLENGTH < question!.length) {
-        throw json({ error: '問題文が長すぎます。' }, { status: 403 })
+        throw error(403, { message: '問題文が長すぎます。' })
     }
 
     if (userContext && USER_CONTEXT_MAXLENGTH < userContext.length) {
-        throw json({ error: '入力が長すぎます。' }, { status: 403 })
+        throw error(403, { message: '入力が長すぎます。' })
     }
 
     const prompt: Part[] = []
 
-    let maxOutputTokens = undefined
+    let responseSchema: ResponseSchema
+    let maxOutputTokens: number
     switch (stepStage) {
         case "describe": {
             prompt.push(...describePrompt(question, generateTone))
+            responseSchema = DESCRIBE_RESPONSE_SCHEMA
             maxOutputTokens = DESCRIBE_MAX_OUTPUT_TOKENS
             break
         }
         case "explain": {
             prompt.push(...explainPrompt(question, generateTone))
+            responseSchema = EXPLAIN_RESPONSE_SCHEMA
             maxOutputTokens = EXPLAIN_MAX_OUTPUT_TOKENS
             break
         }
         case "solve": {
             prompt.push(...solvePrompt(question, generateTone))
+            responseSchema = SOLVE_RESPONSE_SCHEMA
             maxOutputTokens = SOLVE_MAX_OUTPUT_TOKENS
             break
         }
@@ -65,15 +73,31 @@ export async function questionStep(platformEnv: Env | undefined, requestHeaders:
         prompt.push({ text: `【追加情報または補足指示】${userContext}` })
     }
 
-    const candidate = await generate(platformEnv, prompt, maxOutputTokens)
+    const generationConfig: GenerationConfig = {
+        responseMimeType: 'application/json',
+        responseSchema,
+        maxOutputTokens: maxOutputTokens ? maxOutputTokens : DEFAULT_MAX_OUTPUT_TOKENS,
+        temperature: GENERATION_CONFIG_TEMPERATURE,
+        candidateCount: 1,
+    }
 
-    const generatedText = candidate.content.parts.map((part) => part.text).join("")
+    const candidate = await generate(platformEnv, prompt, generationConfig, maxOutputTokens)
 
-    return json({ generatedText })
+    let generationText = candidate.content.parts.map((x) => x.text).join('')
+    if (!generationText.endsWith('"\n}')) generationText += '"\n}'
+    if (!generationText.endsWith('}')) generationText += '}'
+
+    console.log(generationText)
+    try {
+        const generation = JSON.parse(generationText)
+        return json({ generation })
+    } catch (e: unknown) {
+        return error(500, 'せいせいないようがふせいでした')
+    }
 }
 
 function premiseFullContext(wholeText: string | undefined, imageBase64: string | undefined, imageMime: string | undefined): Part[] {
-    const ret: Part[] = [{ text: MATH_PROMPT_START }]
+    const ret: Part[] = [{ text: PROMPT_START }]
 
     if (!wholeText && !imageBase64) return ret
 
