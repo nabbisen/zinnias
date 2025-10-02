@@ -1,4 +1,4 @@
-import { DEFAULT_GENERATIVE_MODEL, DEFAULT_MAX_OUTPUT_TOKENS, GENERATIVE_MODEL_SYSTEM_INSTRUCTION } from "$lib/constants/api/math-guide";
+import { DEFAULT_GENERATIVE_MODEL, GENERATIVE_MODEL_SYSTEM_INSTRUCTION } from "$lib/constants/api/math-guide";
 import { PROMPT_START } from "$lib/constants/api/math-guide/image-analyze";
 import { IMAGE_DEFAULT_MIME } from "$lib/constants/common/image";
 import { VertexAI, type GenerateContentCandidate, type GenerationConfig, type GenerativeModel, type Part } from "@google-cloud/vertexai";
