@@ -1,4 +1,4 @@
-import { DEFAULT_GENERATIVE_MODEL, DEFAULT_MAX_OUTPUT_TOKENS } from "$lib/constants/api/math-guide";
+import { DEFAULT_GENERATIVE_MODEL, DEFAULT_MAX_OUTPUT_TOKENS, GENERATIVE_MODEL_SYSTEM_INSTRUCTION } from "$lib/constants/api/math-guide";
 import { PROMPT_START } from "$lib/constants/api/math-guide/image-analyze";
 import { IMAGE_DEFAULT_MIME } from "$lib/constants/common/image";
 import { VertexAI, type GenerateContentCandidate, type GenerationConfig, type GenerativeModel, type Part } from "@google-cloud/vertexai";
@@ -85,6 +85,7 @@ export function generativeModel(credentials: Record<string, any>, model?: string
 
     const generativeModel = vertex_ai.getGenerativeModel({
         model: model || DEFAULT_GENERATIVE_MODEL,
+        systemInstruction: GENERATIVE_MODEL_SYSTEM_INSTRUCTION,
     });
 
     return generativeModel
