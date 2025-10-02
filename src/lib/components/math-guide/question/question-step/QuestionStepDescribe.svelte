@@ -2,7 +2,7 @@
 	import CopyToClipboard from '$lib/components/common/CopyToClipboard.svelte'
 	import Translate from '$lib/components/translate/Translate.svelte'
 	import type { MathGuideQuestionStep } from '$lib/types/(view)/math-guide/question-step'
-	import { markdownToMathHTML, processTranslatedText } from '$lib/utils/(view)/math-guide'
+	import { markdownToMathHTML, processTranslatedText } from '$lib/utils/(view)/math-guide/question'
 	import QuestionStepBase from './base/QuestionStepBase.svelte'
 
 	const {

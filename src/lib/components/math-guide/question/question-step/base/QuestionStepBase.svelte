@@ -1,11 +1,8 @@
 <script lang="ts">
 	import { generateQuestionStep } from '$lib/(view)/math-guide/question-step'
-	import CopyToClipboard from '$lib/components/common/CopyToClipboard.svelte'
-	import Translate from '$lib/components/translate/Translate.svelte'
 	import { messages } from '$lib/stores/message-center.svelte'
 	import type { MathGuideQuestionStep } from '$lib/types/(view)/math-guide/question-step'
 	import type { MathGuideQuestionStepStage } from '$lib/types/common/math-guide/question-step'
-	import { markdownToMathHTML } from '$lib/utils/(view)/math-guide'
 	import type { Snippet } from 'svelte'
 
 	const {

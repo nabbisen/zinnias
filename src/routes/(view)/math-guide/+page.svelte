@@ -1,16 +1,16 @@
 <script lang="ts">
 	import Usage from '$lib/components/math-guide/Usage.svelte'
-	import ImageSelect from '$lib/components/math-guide/ImageSelect.svelte'
 	import type { MathImageContent } from '$lib/types/(view)/math-guide/image'
 	import type { ImageTextData } from '$lib/types/(view)/common/image'
 	import Question from '$lib/components/math-guide/Question.svelte'
+	import ImageToQuestion from '$lib/components/math-guide/ImageToQuestion.svelte'
 
 	let showsUsage = $state(false)
 
 	let imageContent: MathImageContent | null = $state(null)
 	let imageTextData: ImageTextData | null = $state(null)
 
-	function fileOnchange(c: MathImageContent | null, i: ImageTextData | null) {
+	function questionOnchange(c: MathImageContent | null, i: ImageTextData | null) {
 		imageContent = c
 		imageTextData = i
 	}
@@ -33,7 +33,7 @@
 
 <h3>がぞうをしてい</h3>
 
-<ImageSelect {fileOnchange} />
+<ImageToQuestion {questionOnchange} />
 
 {#key imageContent}
 	{#if imageContent && imageTextData}
