@@ -3,7 +3,7 @@
 	import type { MathImageContent } from '$lib/types/(view)/math-guide/image'
 	import ImageAnalyze from './image-to-question/ImageAnalyze.svelte'
 	import ImageSelect from './image-to-question/ImageSelect.svelte'
-	// import ImageCreate from './image-to-question/ImageCreate.svelte'
+	import ImageCreate from './image-to-question/ImageCreate.svelte'
 	import type { QuestionImage } from '$lib/types/(view)/math-guide/image-select'
 	import { fileToQuestionImage } from '$lib/utils/(view)/math-guide/image-to-question'
 
@@ -30,7 +30,7 @@
 <article>
 	<header>
 		<ImageSelect {fileOnchange} />
-		<!-- <ImageCreate {fileOnchange} /> -->
+		<ImageCreate {fileOnchange} />
 	</header>
 
 	{#if questionImage}

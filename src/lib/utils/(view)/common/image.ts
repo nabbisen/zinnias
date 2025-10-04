@@ -21,6 +21,12 @@ async function fileToDataUrl(file: File): Promise<string> {
     })
 }
 
+export async function dataUrlToFile(dataUrl: string, fileName: string) {
+    const res = await fetch(dataUrl);
+    const blob = await res.blob();
+    return new File([blob], fileName, { type: blob.type });
+}
+
 export async function imageOptimize(
     image: File,
     resizeToWidth: number,
