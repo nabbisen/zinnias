@@ -1,5 +1,13 @@
 # Zinnias 🌼
 
+## Start up
+
+HTTPS is required for camera usage. Generate SSL key and cert with the command lines:
+
+```sh
+openssl genrsa -out key.pem 2048; openssl req -x509 -sha256 -days 365 -key key.pem -out cert.pem -subj "/CN=localhost"
+```
+
 ## Dev
 
 ```sh
