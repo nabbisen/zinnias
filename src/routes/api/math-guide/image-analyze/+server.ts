@@ -36,7 +36,7 @@ export const POST: RequestHandler = async ({ request, platform }) => {
     try {
         validated = await mathGuideImageValidate(platform?.env as Env | undefined, downscaledImageBase64)
     } catch (e: unknown) {
-        console.log(e)
+        console.error(e)
         return error(500, { message: '画像のけんしょうに失敗しました。' })
     }
 
@@ -48,7 +48,7 @@ export const POST: RequestHandler = async ({ request, platform }) => {
     try {
         detectedText = await mathGuideTextFromImage(platform?.env as Env | undefined, imageBase64)
     } catch (e: unknown) {
-        console.log(e)
+        console.error(e)
         return error(500, { message: 'テキストちゅうしゅつに失敗しました。' })
     }
 
@@ -56,7 +56,7 @@ export const POST: RequestHandler = async ({ request, platform }) => {
     try {
         candidate = await imageAnalyze(platform?.env as Env | undefined, detectedText, downscaledImageBase64)
     } catch (e: unknown) {
-        console.log(e)
+        console.error(e)
         return error(500, { message: 'API しょり失敗' })
     }
 
