@@ -24,7 +24,7 @@ export async function textFromImage(file: File): Promise<string> {
     }
 
     if (!response.ok) {
-        throw new Error(`クエリに失敗しました: ${response.body} (status = ${response.status})`)
+        throw new Error(`クエリに失敗しました: ${JSON.parse(await response.text()).message} (status = ${response.status})`)
     }
 
     const responseJson: Record<string, any> = await response.json()

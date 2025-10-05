@@ -21,7 +21,7 @@ export async function postJson(path: string, requestJson: Record<string, any>): 
     }
 
     if (!response.ok) {
-        throw new Error(`クエリに失敗しました: ${response.body} (status = ${response.status})`)
+        throw new Error(`クエリに失敗しました: ${JSON.parse(await response.text()).message} (status = ${response.status})`)
     }
 
     return response.json()
